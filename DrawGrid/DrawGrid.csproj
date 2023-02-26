@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="img\side0.png" />
+    <None Remove="img\side1.png" />
+    <None Remove="img\side2.png" />
+    <None Remove="img\side3.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ScottPlot.WPF" Version="4.1.60" />
+    <PackageReference Include="WPFToggleSwitch" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="img\side0.png" />
+    <Resource Include="img\side1.png" />
+    <Resource Include="img\side2.png" />
+    <Resource Include="img\side3.png" />
+  </ItemGroup>
+
+</Project>
