@@ -20,7 +20,7 @@ global using static System.Math;
 
 
 // Project
-
+global using Numerics;
 
 // Project-static
 global using static DrawGrid.other.Helper;

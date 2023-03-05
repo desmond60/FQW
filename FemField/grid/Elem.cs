@@ -6,6 +6,8 @@ public struct Elem
     //: Fields and properties
     public int[]  Node;   /// Numbers node final element
     public int[]  Edge;   /// Numbers edge final element
+    public int    NumMaterial { get; set; }   /// Номер материала
+    public double Sigma       { get; set; }   /// Значение Sigma
 
     //: Constructor
     public Elem(params int[] node) { 

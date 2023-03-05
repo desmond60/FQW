@@ -38,15 +38,15 @@
                        TextWrapping="Wrap" 
                        Text="Панель инструментов"
                        FontSize="18"
-                       Canvas.Top="10"/>
+                       Canvas.Top="3"/>
 
             <!--Separator-->
-            <StackPanel Orientation="Horizontal" Canvas.Top="30">
+            <StackPanel Orientation="Horizontal" Canvas.Top="15">
                 <Separator Height="15" Width="350"/>
             </StackPanel>
 
             <!-- % ***** Левая-Нижняя точка (Большого поля) ***** % -->
-            <StackPanel Canvas.Top="50"
+            <StackPanel Canvas.Top="25"
                         Canvas.Left="5">
                 <TextBlock FontSize="16"
                            Margin="40,2,20,2"
@@ -80,7 +80,7 @@
             </StackPanel>
 
             <!-- % ***** Правая-Верхняя точка (Большого поля) ***** % -->
-            <StackPanel Canvas.Top="100"
+            <StackPanel Canvas.Top="70"
                         Canvas.Left="5">
                 <TextBlock FontSize="16"
                            Margin="40,2,10,2"
@@ -113,8 +113,20 @@
                 </DockPanel>
             </StackPanel>
 
+            <!--Separator-->
+            <StackPanel Orientation="Horizontal" Canvas.Top="110">
+                <Separator Height="15" Width="350"/>
+            </StackPanel>
+
+            <!-- % ***** Надпись ***** % -->
+            <TextBlock Canvas.Left="105" 
+                       TextWrapping="Wrap" 
+                       Text="Добавление объектов:"
+                       FontSize="16"
+                       Canvas.Top="120"/>
+
             <!-- % ***** Левая-Нижняя точка (Малого поля) ***** % -->
-            <StackPanel Canvas.Top="150"
+            <StackPanel Canvas.Top="140"
                         Canvas.Left="5">
                 <TextBlock FontSize="16"
                            Margin="40,2,85,2"
@@ -148,7 +160,7 @@
             </StackPanel>
 
             <!-- % ***** Правая-Верхняя точка объекта ***** % -->
-            <StackPanel Canvas.Top="200"
+            <StackPanel Canvas.Top="185"
                         Canvas.Left="5">
                 <TextBlock FontSize="16"
                            Margin="40,2,75,2"
@@ -181,9 +193,72 @@
                 </DockPanel>
             </StackPanel>
 
-            <!-- % ***** Toggle (Строгая сетка) ***** % -->
+            <!-- % ***** Количество разбиений по объекту (Ox) ***** % -->
+            <DockPanel Canvas.Top="235"
+                       Canvas.Left="5">
+                <TextBlock Margin="5,2,0,2"
+                           FontSize="16"
+                           Text="Количество разбиений по объекту (Ox)"/>
+                <TextBox x:Name="N_X"
+                         Padding="2"
+                         TextWrapping="NoWrap"
+                         Text="6"
+                         TextAlignment="Center"
+                         Width="50"
+                         PreviewTextInput="PreviewTextInputInt"/>
+            </DockPanel>
+
+            <!-- % ***** Количество разбиений по объекту (Oy) ***** % -->
             <DockPanel Canvas.Top="260"
-                       Canvas.Left="10"
+                       Canvas.Left="5">
+                <TextBlock Margin="5,2,0,2"
+                           FontSize="16"
+                           Text="Количество разбиений по объекту (Oy)"/>
+                <TextBox x:Name="N_Y"
+                         Padding="2"
+                         TextWrapping="NoWrap"
+                         Text="6"
+                         TextAlignment="Center"
+                         Width="50"
+                         PreviewTextInput="PreviewTextInputInt"/>
+            </DockPanel>
+
+            <!-- % ***** Добавление и удаление объектов ***** % -->
+            <DockPanel Canvas.Top="285"
+                       Canvas.Left="15">
+                <ListBox x:Name="itemsList"  Width="100"  Height="100"/>
+                <StackPanel>
+                    <DockPanel>
+                        <TextBlock Margin="2"
+                           FontSize="16"
+                           Text="Название: "/>
+                        <TextBox x:Name="TextItem"
+                             Padding="2"
+                             Margin="02"
+                             TextWrapping="NoWrap"
+                             TextAlignment="Center"
+                             Width="100"
+                             PreviewTextInput="PreviewTextInputName"/>
+                    </DockPanel>
+                    <Button Content="Добавить объект"
+                            Click="AddItem_Click"
+                            Margin="5"
+                            Width="130"/>
+                    <Button Content="Удалить объект"
+                            Click="RemoveItem_Click"
+                            Margin="5"
+                            Width="130"/>
+                </StackPanel>
+            </DockPanel>
+
+            <!--Separator-->
+            <StackPanel Orientation="Horizontal" Canvas.Top="380">
+                <Separator Height="15" Width="350"/>
+            </StackPanel>
+
+            <!-- % ***** Toggle (Строгая сетка) ***** % -->
+            <DockPanel Canvas.Top="390"
+                       Canvas.Left="5"
                        Width="330">
                 <TextBlock Margin="5,2,0,2"
                            FontSize="16"
@@ -198,28 +273,28 @@
                                      SwitchContentPlacement="Right"/>
             </DockPanel>
 
-            <!-- % ***** Количество узлов по объекту (ОX) ***** % -->
-            <DockPanel Canvas.Top="300"
+            <!-- % ***** Минимальный шаг по объекту ***** % -->
+            <DockPanel Canvas.Top="415"
                        Canvas.Left="5">
                 <TextBlock Margin="5,2,0,2"
                            FontSize="16"
-                           Text="Количество узлов по объекту (OX):  "/>
-                <TextBox x:Name="N_X"
+                           Text="Мин. шаг по объекту: "/>
+                <TextBox x:Name="Min_step_item"
                          Padding="2"
                          TextWrapping="NoWrap"
-                         Text="5"
+                         Text="0.01"
                          TextAlignment="Center"
                          Width="50"
-                         PreviewTextInput="PreviewTextInputInt"/>
+                         PreviewTextInput="PreviewTextInput"/>
             </DockPanel>
 
-            <!-- % ***** Количество узлов по объекту (ОY) ***** % -->
-            <DockPanel Canvas.Top="325"
+            <!-- % ***** Минимальное количество шагов по объекту ***** % -->
+            <DockPanel Canvas.Top="440"
                        Canvas.Left="5">
                 <TextBlock Margin="5,2,0,2"
                            FontSize="16"
-                           Text="Количество узлов по объекту (ОY):  "/>
-                <TextBox x:Name="N_Y"
+                           Text="Мин. количество шагов по объекту: "/>
+                <TextBox x:Name="Min_Count_step"
                          Padding="2"
                          TextWrapping="NoWrap"
                          Text="5"
@@ -229,7 +304,7 @@
             </DockPanel>
 
             <!-- % ***** Коэффициент разрядки от объекта (ОX) ***** % -->
-            <DockPanel Canvas.Top="350"
+            <DockPanel Canvas.Top="465"
                        Canvas.Left="5">
                 <TextBlock Margin="5,2,0,2"
                            FontSize="16"
@@ -244,7 +319,7 @@
             </DockPanel>
 
             <!-- % ***** Коэффициент разрядки от объекта (ОY) ***** % -->
-            <DockPanel Canvas.Top="375"
+            <DockPanel Canvas.Top="490"
                        Canvas.Left="5">
                 <TextBlock Margin="5,2,0,2"
                            FontSize="16"
@@ -258,8 +333,20 @@
                          PreviewTextInput="PreviewTextInput"/>
             </DockPanel>
 
+            <!--Separator-->
+            <StackPanel Orientation="Horizontal" Canvas.Top="510">
+                <Separator Height="15" Width="350"/>
+            </StackPanel>
+            
+            <!-- % ***** Надпись ***** % -->
+            <TextBlock Canvas.Left="105" 
+                       TextWrapping="Wrap" 
+                       Text="Добавление слоев:"
+                       FontSize="16"
+                       Canvas.Top="520"/>
+
             <!-- % ***** Добавление и удаление слоев ***** % -->
-            <DockPanel Canvas.Top="405"
+            <DockPanel Canvas.Top="540"
                        Canvas.Left="15">
                 <ListBox x:Name="layersList"  Width="100"  Height="100"/>
                 <StackPanel>
@@ -281,29 +368,26 @@
                 </StackPanel>
             </DockPanel>
 
-            <!-- % ***** Кнопка построить сетку ***** % -->
-            <DockPanel Canvas.Top="520"
-                       Canvas.Left="95">
-                <Button Content="Построить сетку"
-                        Click="BuildGrid_Click"
-                        Width="150" Height="25"/>
-            </DockPanel>
+            <!--Separator-->
+            <StackPanel Orientation="Horizontal" Canvas.Top="635">
+                <Separator Height="15" Width="350"/>
+            </StackPanel>
 
             <!-- % ***** Краевые на границах ***** % -->
-            <TextBlock Canvas.Top="550"
-                       Canvas.Left="50"
+            <TextBlock Canvas.Top="645"
+                       Canvas.Left="60"
                        Margin="5,2,0,2"
-                       FontSize="16"
+                       FontSize="15"
                        Text="Краевые условия на границах:"/>
 
-            <!-- % ***** Нижняя сторона ***** % -->
-            <StackPanel Canvas.Top="580"
+            <!-- % ***** Нижняя и правая сторона ***** % -->
+            <DockPanel Canvas.Top="668"
                         Canvas.Left="15">
                 <DockPanel>
                     <Image Source="img\side0.png"
                            Width="25"/>
                     <TextBox x:Name="Side0Text"
-                             Margin="10,0,0,0"
+                             Margin="10,0,50,0"
                              Padding="2"
                              TextWrapping="NoWrap"
                              Text="1"
@@ -311,11 +395,6 @@
                              Width="50"
                              PreviewTextInput="PreviewTextInputIntBounds"/>
                 </DockPanel>
-            </StackPanel>
-
-            <!-- % ***** Правая сторона ***** % -->
-            <StackPanel Canvas.Top="610"
-                        Canvas.Left="15">
                 <DockPanel>
                     <Image Source="img\side1.png"
                            Width="25"/>
@@ -328,16 +407,16 @@
                              Width="50"
                              PreviewTextInput="PreviewTextInputIntBounds"/>
                 </DockPanel>
-            </StackPanel>
+            </DockPanel>
 
-            <!-- % ***** Верхняя сторона ***** % -->
-            <StackPanel Canvas.Top="640"
+            <!-- % ***** Верхняя и левая сторона ***** % -->
+            <DockPanel Canvas.Top="700"
                         Canvas.Left="15">
                 <DockPanel>
                     <Image Source="img\side2.png"
                            Width="25"/>
                     <TextBox x:Name="Side2Text"
-                             Margin="10,0,0,0"
+                             Margin="10,0,50,0"
                              Padding="2"
                              TextWrapping="NoWrap"
                              Text="1"
@@ -345,11 +424,6 @@
                              Width="50"
                              PreviewTextInput="PreviewTextInputIntBounds"/>
                 </DockPanel>
-            </StackPanel>
-
-            <!-- % ***** Левая сторона ***** % -->
-            <StackPanel Canvas.Top="670"
-                        Canvas.Left="15">
                 <DockPanel>
                     <Image Source="img\side3.png"
                            Width="25"/>
@@ -362,12 +436,15 @@
                              Width="50"
                              PreviewTextInput="PreviewTextInputIntBounds"/>
                 </DockPanel>
-            </StackPanel>
+            </DockPanel>
 
-            <!--Separator-->
-            <StackPanel Orientation="Horizontal" Canvas.Top="700">
-                <Separator Height="15" Width="350"/>
-            </StackPanel>
+            <!-- % ***** Кнопка построить сетку ***** % -->
+            <DockPanel Canvas.Top="730"
+                       Canvas.Left="95">
+                <Button Content="Построить сетку"
+                        Click="BuildGrid_Click"
+                        Width="150" Height="25"/>
+            </DockPanel>
 
         </Canvas>
         <!--#endregion-->

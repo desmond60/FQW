@@ -26,4 +26,14 @@
     <Resource Include="img\side3.png" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="lib\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Numerics">
+      <HintPath>lib\Numerics.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

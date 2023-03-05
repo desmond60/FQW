@@ -1,4 +1,6 @@
-﻿namespace DrawGrid;
+﻿using System.Security.RightsManagement;
+
+namespace DrawGrid;
 
 // % ***** Structure Grid ***** % //
 public struct Grid<T> where T : System.Numerics.INumber<T>
@@ -142,5 +144,25 @@ public struct Bound
         StringBuilder str_elem = new StringBuilder();
         str_elem.Append($"{NumBound,0} {NumSide,3} {Edge,5}");
         return str_elem.ToString();
+    }
+}
+
+// % ***** Structure Item ***** % //
+public struct Item
+{
+    //: Fields and properties
+    public Vector<double> Begin { get; set; }
+    public Vector<double> End { get; set; }
+    public int Nx { get; set; }
+    public int Ny { get; set; }
+    public string Name { get; set; }
+
+    //: Constructor
+    public Item(Vector<double> begin, Vector<double> end, int nx, int ny, string name = "None") {
+        this.Begin = (Vector<double>)begin.Clone();
+        this.End   = (Vector<double>)end.Clone();
+        this.Nx    = nx;
+        this.Ny    = ny;
+        this.Name  = name;
     }
 }

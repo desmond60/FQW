@@ -7,24 +7,29 @@ public partial class MainWindow : Window
         CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
         InitializeComponent();
         layersList.ItemsSource = layers_str;
+        itemsList.ItemsSource = items_str;
     }
 
     /* ----------------------- Переменные --------------------------------- */
-    double[] Begin_BG  = new double[2];   // Левая-Нижняя точка (Большого поля)
-    double[] End_BG    = new double[2];   // Правая-Верхняя точка (Большого поля)
-    double[] Begin_SML = new double[2];   // Левая-Нижняя точка объекта
-    double[] End_SML   = new double[2];   // Правая-Верхняя точка объекта
+    Vector<double> Begin_BG  = new Vector<double>(2);   // Левая-Нижняя точка (Большого поля)
+    Vector<double> End_BG    = new Vector<double>(2);   // Правая-Верхняя точка (Большого поля)
 
-    int Nx, Ny;           // Количество узлов по объекту
-    int CountX, CountY;   // Количество узлов по Осям
-    double Kx, Ky;        // Коэффициент разрядки пот объекта
+    int Nx, Ny;             // Количество узлов по объекту
+    int CountX, CountY;     // Количество узлов по Осям
+    double Kx, Ky;          // Коэффициент разрядки пот объекта
+    double min_step;        // Минимальный шаг по объекту
+    int min_count_step;     // Минимальное количество шагов по оюъекту
 
     bool IsStrictGrid  = false;   // Строгая ли сетка?
+    double e = 0.01;   // e = 0.01*l не должно быть узких мест в сетке
 
     List<string> layers_str  = new List<string>();         // Горизонтальные слои для ListBox
+    List<string> items_str   = new List<string>();         // Объекты для  ListBox
     List<double> layers      = new List<double>();         // Горизонтальные слои
+    List<Item> items         = new List<Item>();           // Объекты на сетке
     int[]? SideBound;                                      // Номера краевых на сторонах
     Grid<double> grid;                                     // Структура сетки
+
     /* ----------------------- Переменные --------------------------------- */
 
     //: Обновление компонент
@@ -33,15 +38,12 @@ public partial class MainWindow : Window
         Begin_BG[1]  = Double.Parse(Begin_BG_Y.Text);
         End_BG[0]    = Double.Parse(End_BG_X.Text);
         End_BG[1]    = Double.Parse(End_BG_Y.Text);
-        Begin_SML[0] = Double.Parse(Begin_SML_X.Text);
-        Begin_SML[1] = Double.Parse(Begin_SML_Y.Text);
-        End_SML[0]   = Double.Parse(End_SML_X.Text);
-        End_SML[1]   = Double.Parse(End_SML_Y.Text);
 
         layers = new List<double>(layers_str.Select(n => double.Parse(n)).OrderByDescending(n => n));
 
-        Nx = Int32.Parse(N_X.Text);
-        Ny = Int32.Parse(N_Y.Text);
+        min_step = Double.Parse(Min_step_item.Text);
+        min_count_step = Int32.Parse(Min_Count_step.Text);
+        
         Kx = Double.Parse(K_X.Text);
         Ky = Double.Parse(K_Y.Text);
 
