@@ -1,34 +1,32 @@
-﻿namespace DrawGrid;
+﻿namespace FEM;
 
 public partial class MainWindow : Window
 {
-    public MainWindow()
-    {
-        CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("en-US");
+    public MainWindow() {
         InitializeComponent();
-        layersList.ItemsSource = layers_str;
-        itemsList.ItemsSource = items_str;
+        CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("en-US");   // Установка культуры
+        itemsList.ItemsSource  = items_str;    // ListBox для объектов
+        layersList.ItemsSource = layers_str;   // ListBox для слоев
     }
 
     /* ----------------------- Переменные --------------------------------- */
     Vector<double> Begin_BG  = new Vector<double>(2);   // Левая-Нижняя точка (Большого поля)
     Vector<double> End_BG    = new Vector<double>(2);   // Правая-Верхняя точка (Большого поля)
 
-    int Nx, Ny;             // Количество узлов по объекту
-    int CountX, CountY;     // Количество узлов по Осям
-    double Kx, Ky;          // Коэффициент разрядки пот объекта
+    int CountX, CountY;     // Количество узлов по Осям для графика
+    double Kx, Ky;          // Коэффициент разрядки от объекта
     double min_step;        // Минимальный шаг по объекту
     int min_count_step;     // Минимальное количество шагов по оюъекту
 
     bool IsStrictGrid  = false;   // Строгая ли сетка?
     double e = 0.01;   // e = 0.01*l не должно быть узких мест в сетке
 
-    List<string> layers_str  = new List<string>();         // Горизонтальные слои для ListBox
-    List<string> items_str   = new List<string>();         // Объекты для  ListBox
-    List<double> layers      = new List<double>();         // Горизонтальные слои
-    List<Item> items         = new List<Item>();           // Объекты на сетке
-    int[]? SideBound;                                      // Номера краевых на сторонах
-    Grid<double> grid;                                     // Структура сетки
+    List<string> layers_str  = new List<string>();   // Горизонтальные слои для ListBox
+    List<string> items_str   = new List<string>();   // Объекты для  ListBox
+    List<double> layers      = new List<double>();   // Горизонтальные слои
+    List<Item> items         = new List<Item>();     // Объекты на сетке
+    int[]? SideBound;                                // Номера краевых на сторонах
+    Grid<double> grid;                               // Структура сетки
 
     /* ----------------------- Переменные --------------------------------- */
 
@@ -90,9 +88,9 @@ public partial class MainWindow : Window
                 dataY[j] = grid.Nodes[i * CountX + j].Y;
             }
             if (ListContains(layers, dataY[0]))
-                GridPlot.Plot.AddScatter(dataX, dataY, System.Drawing.Color.OrangeRed);
+                GridPlot.Plot.AddScatter(dataX, dataY, Color.OrangeRed);
             else
-                GridPlot.Plot.AddScatter(dataX, dataY, System.Drawing.Color.Blue);
+                GridPlot.Plot.AddScatter(dataX, dataY, Color.Blue);
         }
 
         // Рисование линий по Оси Y
@@ -103,8 +101,40 @@ public partial class MainWindow : Window
                 dataX[j] = grid.Nodes[j * CountX + i].X;
                 dataY[j] = grid.Nodes[j * CountX + i].Y;
             }
-            var scatter = GridPlot.Plot.AddScatter(dataX, dataY, System.Drawing.Color.Blue);
+            var scatter = GridPlot.Plot.AddScatter(dataX, dataY, Color.Blue);
             scatter.MarkerColor = Color.DarkBlue;
+        }
+
+        // Рисование объектов
+        foreach (var item in items) {
+
+            // Нижняя линия
+            dataX = new double[2] { item.Begin[0], item.End[0] };
+            dataY = new double[2] { item.Begin[1], item.Begin[1] };
+            var scatter = GridPlot.Plot.AddScatter(dataX, dataY, Color.DarkGreen);
+            scatter.LineWidth = 5;
+            scatter.MarkerColor = Color.DarkRed;
+
+            // Правая линия
+            dataX = new double[2] { item.End[0], item.End[0] };
+            dataY = new double[2] { item.Begin[1], item.End[1] };
+            scatter = GridPlot.Plot.AddScatter(dataX, dataY, Color.DarkGreen);
+            scatter.LineWidth = 5;
+            scatter.MarkerColor = Color.DarkRed;
+
+            // Верхняя линия
+            dataX = new double[2] { item.Begin[0], item.End[0] };
+            dataY = new double[2] { item.End[1], item.End[1] };
+            scatter = GridPlot.Plot.AddScatter(dataX, dataY, Color.DarkGreen);
+            scatter.LineWidth = 5;
+            scatter.MarkerColor = Color.DarkRed;
+
+            // Левая линия
+            dataX = new double[2] { item.Begin[0], item.Begin[0] };
+            dataY = new double[2] { item.Begin[1], item.End[1] };
+            scatter = GridPlot.Plot.AddScatter(dataX, dataY, Color.DarkGreen);
+            scatter.LineWidth = 5;
+            scatter.MarkerColor = Color.DarkRed;
         }
 
         // Настройки графика
@@ -113,7 +143,6 @@ public partial class MainWindow : Window
         GridPlot.Plot.Title("Конечноэлементная сетка");
 
         GridPlot.Refresh();
-        GridPlot.Plot.SaveFig(@"grid.png");
     }
 }
 

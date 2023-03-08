@@ -1,4 +1,4 @@
-﻿namespace DrawGrid;
+﻿namespace FEM;
 
 //: Обработчики Button
 public partial class MainWindow : Window {
@@ -58,11 +58,36 @@ public partial class MainWindow : Window {
             MessageBox.Show("Выберете объект!");
             return;
         }
-        string name = (string)layersList.SelectedValue;
+        string name = (string)itemsList.SelectedValue;
         items_str.Remove(name);
         itemsList.Items.Refresh();
         items.RemoveAll(n => n.Name.Equals(name));
     }
+
+    //: Обработка кнопки "Изменить объект"
+    private void EditItem_Click(object sender, RoutedEventArgs e) {
+
+        // Если объект не выбран
+        if (itemsList.SelectedValue == null) {
+            MessageBox.Show("Выберете объект!");
+            return;
+        }
+
+        string name = (string)itemsList.SelectedValue;
+        int index = items.FindIndex(n => n.Name.Equals(name));
+
+        Vector<double> Begin_SML = new Vector<double>(2);
+        Vector<double> End_SML = new Vector<double>(2);
+        Begin_SML[0] = Double.Parse(Begin_SML_X.Text);
+        Begin_SML[1] = Double.Parse(Begin_SML_Y.Text);
+        End_SML[0] = Double.Parse(End_SML_X.Text);
+        End_SML[1] = Double.Parse(End_SML_Y.Text);
+        int Nx = Int32.Parse(N_X.Text) < min_count_step ? min_count_step : Int32.Parse(N_X.Text);
+        int Ny = Int32.Parse(N_Y.Text) < min_count_step ? min_count_step : Int32.Parse(N_Y.Text);
+
+        items[index] = new Item(Begin_SML, End_SML, Nx, Ny, name);
+    }
+
 
     //: Обработка кнопки "Построить сетку"
     private void BuildGrid_Click(object sender, RoutedEventArgs e) {
@@ -71,5 +96,7 @@ public partial class MainWindow : Window {
         DrawGrid();        // Рисуем сетку
     }
 
+    private void Solution_Click(object sender, RoutedEventArgs e) {
 
+    }
 }

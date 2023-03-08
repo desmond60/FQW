@@ -21,8 +21,9 @@ global using static System.Math;
 
 // Project
 global using Numerics;
+global using FEM.grid;
 
 // Project-static
-global using static DrawGrid.other.Helper;
+global using static FEM.other.Helper;
 
 // Alias

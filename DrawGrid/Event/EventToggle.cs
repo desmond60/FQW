@@ -1,4 +1,4 @@
-﻿namespace DrawGrid;
+﻿namespace FEM;
 
 //: Обработчики Toggle
 public partial class MainWindow : Window {

@@ -1,6 +1,4 @@
-﻿using System.Security.RightsManagement;
-
-namespace DrawGrid;
+﻿namespace FEM.grid;
 
 // % ***** Structure Grid ***** % //
 public struct Grid<T> where T : System.Numerics.INumber<T>
@@ -12,31 +10,33 @@ public struct Grid<T> where T : System.Numerics.INumber<T>
     public int Count_Edge { get; set; }    /// Количество ребер
 
     public Node<T>[] Nodes;      /// Узлы
-    public Elem[]    Elems;      /// КЭ
+    public Elem[] Elems;      /// КЭ
     public Edge<T>[] Edges;      /// Ребра
-    public Bound[]   Bounds;     /// Краевые
+    public Bound[] Bounds;     /// Краевые
 
     //: Constructor
-    public Grid(Node<T>[] nodes, Edge<T>[] edges, Elem[] elem, Bound[] bounds) {
-        this.Count_Node = nodes.Length;
-        this.Count_Edge = edges.Length;
-        this.Count_Elem = elem.Length;
-        this.Count_Kraev = bounds.Length;
-        this.Nodes = nodes;
-        this.Edges = edges;
-        this.Elems = elem;
-        this.Bounds = bounds;
+    public Grid(Node<T>[] nodes, Edge<T>[] edges, Elem[] elem, Bound[] bounds)
+    {
+        Count_Node = nodes.Length;
+        Count_Edge = edges.Length;
+        Count_Elem = elem.Length;
+        Count_Kraev = bounds.Length;
+        Nodes = nodes;
+        Edges = edges;
+        Elems = elem;
+        Bounds = bounds;
     }
 
     //: Deconstructor
     public void Deconstruct(out Node<T>[] nodes,
                             out Edge<T>[] edges,
                             out Elem[] elems,
-                            out Bound[] kraevs) {
-        edges  = this.Edges;
-        nodes  = this.Nodes;
-        elems  = this.Elems;
-        kraevs = this.Bounds;
+                            out Bound[] kraevs)
+    {
+        edges = Edges;
+        nodes = Nodes;
+        elems = Elems;
+        kraevs = Bounds;
     }
 }
 
@@ -48,14 +48,16 @@ public struct Node<T> where T : System.Numerics.INumber<T>
     public T Y { get; set; }  /// Coordinate Y
 
     //: Constructor
-    public Node(T _X, T _Y) {
-        (this.X, this.Y) = (_X, _Y);
+    public Node(T _X, T _Y)
+    {
+        (X, Y) = (_X, _Y);
     }
 
     //: Deconstructor
     public void Deconstruct(out T x,
-                            out T y) {
-        (x, y) = (this.X, this.Y);
+                            out T y)
+    {
+        (x, y) = (X, Y);
     }
 
     //: String view structure
@@ -67,18 +69,20 @@ public struct Edge<T> where T : System.Numerics.INumber<T>
 {
     //: Fields and properties
     public Node<T> NodeBegin { get; set; }  /// The begin node of the edge  
-    public Node<T> NodeEnd   { get; set; }  /// The end node of the edge
+    public Node<T> NodeEnd { get; set; }  /// The end node of the edge
 
     //: Constructor
-    public Edge(Node<T> _begin, Node<T> _end) {
-        this.NodeBegin = _begin;
-        this.NodeEnd = _end;
+    public Edge(Node<T> _begin, Node<T> _end)
+    {
+        NodeBegin = _begin;
+        NodeEnd = _end;
     }
 
     //: Deconstructor
     public void Deconstruct(out Node<T> begin,
-                            out Node<T> end) {
-        (begin, end) = (this.NodeBegin, this.NodeEnd);
+                            out Node<T> end)
+    {
+        (begin, end) = (NodeBegin, NodeEnd);
     }
 
     //: String view structure
@@ -93,19 +97,22 @@ public struct Elem
     public int[] Edge;   /// Numbers edge final element
 
     //: Constructor
-    public Elem(params int[] node) {
-        this.Node = node;
+    public Elem(params int[] node)
+    {
+        Node = node;
     }
 
     //: Deconstructor
     public void Deconstruct(out int[] nodes,
-                            out int[] edges) {
-        nodes = this.Node;
-        edges = this.Edge;
+                            out int[] edges)
+    {
+        nodes = Node;
+        edges = Edge;
     }
 
     //: String view structure
-    public override string ToString() {
+    public override string ToString()
+    {
         StringBuilder str_elem = new StringBuilder();
         str_elem.Append($"{Node[0],0}");
         for (int i = 1; i < Node.Count(); i++)
@@ -121,26 +128,29 @@ public struct Elem
 public struct Bound
 {
     //: Fields and properties
-    public int Edge     { get; set; }   /// Number edge
+    public int Edge { get; set; }   /// Number edge
     public int NumBound { get; set; }   /// Number bound
-    public int NumSide  { get; set; }   /// Number side
+    public int NumSide { get; set; }   /// Number side
 
     //: Constructor
-    public Bound(int num, int side, int edge) {
-        this.NumBound = num;
-        this.NumSide = side;
-        this.Edge = edge;
+    public Bound(int num, int side, int edge)
+    {
+        NumBound = num;
+        NumSide = side;
+        Edge = edge;
     }
 
     //: Deconstructor
-    public void Deconstruct(out int num, out int side, out int edge) {
-        num  = this.NumBound;
-        side = this.NumSide;
-        edge = this.Edge;
+    public void Deconstruct(out int num, out int side, out int edge)
+    {
+        num = NumBound;
+        side = NumSide;
+        edge = Edge;
     }
 
     //: String view structure
-    public override string ToString() {
+    public override string ToString()
+    {
         StringBuilder str_elem = new StringBuilder();
         str_elem.Append($"{NumBound,0} {NumSide,3} {Edge,5}");
         return str_elem.ToString();
@@ -158,11 +168,12 @@ public struct Item
     public string Name { get; set; }
 
     //: Constructor
-    public Item(Vector<double> begin, Vector<double> end, int nx, int ny, string name = "None") {
-        this.Begin = (Vector<double>)begin.Clone();
-        this.End   = (Vector<double>)end.Clone();
-        this.Nx    = nx;
-        this.Ny    = ny;
-        this.Name  = name;
+    public Item(Vector<double> begin, Vector<double> end, int nx, int ny, string name = "None")
+    {
+        Begin = (Vector<double>)begin.Clone();
+        End = (Vector<double>)end.Clone();
+        Nx = nx;
+        Ny = ny;
+        Name = name;
     }
 }

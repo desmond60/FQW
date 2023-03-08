@@ -1,8 +1,4 @@
-﻿using ScottPlot.Drawing.Colormaps;
-using System.Collections.Generic;
-using System;
-
-namespace DrawGrid;
+﻿namespace FEM;
 
 
 //: Построение сетки

@@ -1,4 +1,4 @@
-﻿namespace DrawGrid.other;
+﻿namespace FEM.other;
 
 //: Статический класс "Помощник"
 public static class Helper
