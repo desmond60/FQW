@@ -22,8 +22,10 @@ global using static System.Math;
 // Project
 global using Numerics;
 global using FEM.grid;
+global using FEM.slau;
 
 // Project-static
 global using static FEM.other.Helper;
 
 // Alias
+global using Grid = FEM.grid.Grid;

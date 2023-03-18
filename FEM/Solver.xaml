@@ -1,0 +1,95 @@
+﻿<Window x:Class="FEM.Solver"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        
+        WindowStartupLocation="CenterScreen"
+        
+        Title="DrawGrid"
+        Height="656" Width="768"
+        MinHeight="656" MinWidth="768"
+    
+        FontFamily="Times New Roman" 
+        FontWeight="Bold" FontSize="14">
+    <Grid>
+
+        <!--#region  % ***** Вид сетки ***** % -->
+        <Grid.RowDefinitions>
+            <RowDefinition  Height="*" />
+            <RowDefinition  Height="1*" />
+        </Grid.RowDefinitions>
+        <!--#endregion-->
+
+        <Canvas x:Name="SolverBar"
+                Grid.Column="0"
+                Background="#FFC4C4C8">
+
+            <!-- % ***** Надпись nu ***** % -->
+            <DockPanel Canvas.Left="15"
+                       Canvas.Top="15">
+                
+                <TextBlock Text="&#956;: "
+                           Margin="5"
+                           FontSize="18"/>
+                <TextBox x:Name="NuBox"
+                         Padding="2"
+                         Margin="5"
+                         TextWrapping="NoWrap"
+                         Text="1.0"
+                         TextAlignment="Center"
+                         Width="75"
+                         PreviewTextInput="PreviewTextInputDouble"
+                         TextChanged="NuBox_TextChanged"/>
+
+                <TextBlock Text="&#969;=2&#960;&#956;"
+                           Margin="5"
+                           FontSize="18"/>
+                <TextBlock x:Name="WBox"
+                           Text="(6.2831)"
+                           Margin="5"
+                           FontSize="18"/>
+                
+            </DockPanel>
+            
+            <!-- % ***** Надпись ***** % -->
+            <TextBlock Canvas.Left="50"
+                       Canvas.Top="50"
+                       TextWrapping="Wrap" 
+                       Text="Добавление приемников:"
+                       FontSize="16"/>
+
+            <!-- % ***** Добавление и удаление слоев ***** % -->
+            <DockPanel Canvas.Top="80"
+                       Canvas.Left="15">
+                <ListBox x:Name="receiversList"  Width="100"  Height="100"/>
+                <StackPanel>
+                    <DockPanel>
+                        <TextBlock Margin="2"
+                                   FontSize="16"
+                                   Text="Значение: "/>
+                        <TextBox x:Name="ReceiverBox"
+                                 Padding="2"
+                                 TextWrapping="NoWrap"
+                                 TextAlignment="Center"
+                                 Width="100"
+                                 PreviewTextInput="PreviewTextInputDouble"/>
+                    </DockPanel>
+                    <Button Content="Добавить приемник"
+                            Click="AddReceiver_Click"
+                            Margin="2"
+                            Width="150"/>
+                    <Button Content="Удалить приемник"
+                            Click="RemoveReceiver_Click"
+                            Margin="2"
+                            Width="150"/>
+                </StackPanel>
+            </DockPanel>
+
+            <StackPanel Canvas.Top="200">
+                <Button Content="Составить СЛАУ"
+                    Click="CreateSLAU_Click"/>
+            </StackPanel>
+
+        </Canvas>
+
+    </Grid>
+</Window>

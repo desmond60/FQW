@@ -1,5 +1,6 @@
 ﻿namespace FEM;
 
+// % ****** Логика взаимодействия с окошком MainWindow ***** % //
 public partial class MainWindow : Window
 {
     public MainWindow() {
@@ -25,8 +26,8 @@ public partial class MainWindow : Window
     List<string> items_str   = new List<string>();   // Объекты для  ListBox
     List<double> layers      = new List<double>();   // Горизонтальные слои
     List<Item> items         = new List<Item>();     // Объекты на сетке
-    int[]? SideBound;                                // Номера краевых на сторонах
-    Grid<double> grid;                               // Структура сетки
+    int[] SideBound;                                 // Номера краевых на сторонах
+    Grid grid;                                       // Структура сетки
 
     /* ----------------------- Переменные --------------------------------- */
 
@@ -53,24 +54,99 @@ public partial class MainWindow : Window
         SideBound = new int[] { side0, side1, side2, side3 };
     }
 
+    //: Запись интерфейса
+    private void WriteInterface() {
+        StringBuilder interface_str = new StringBuilder();
+
+        interface_str.Append($"{Begin_BG[0]} {Begin_BG[1]} {End_BG[0]} {End_BG[1]}\n");
+        interface_str.Append($"{CountX} {CountY}\n");
+        interface_str.Append($"{Kx} {Ky}\n");
+        interface_str.Append($"{min_step} {min_count_step}\n");
+        interface_str.Append($"{IsStrictGrid}\n");
+        interface_str.Append($"{SideBound[0]} {SideBound[1]} {SideBound[2]} {SideBound[3]}\n");
+
+        File.WriteAllText(@"grid/interface.txt", interface_str.ToString());
+    }
+
+    //: Загрузка интерфейса из grid
+    private void LoadInterface() {
+
+        string[] interface_str = File.ReadAllLines(@"grid/interface.txt");
+
+        // Установка точек большого поля
+        var line = interface_str[0].Trim().Split(" ");
+        Begin_BG = new Vector<double>(new double[] { double.Parse(line[0]), double.Parse(line[1])});
+        End_BG = new Vector<double>(new double[] { double.Parse(line[2]), double.Parse(line[3]) });
+        Begin_BG_X.Text = Begin_BG[0].ToString();
+        Begin_BG_Y.Text = Begin_BG[1].ToString();
+        End_BG_X.Text = End_BG[0].ToString();
+        End_BG_Y.Text = End_BG[1].ToString();
+
+        // Установка линий для графика
+        line = interface_str[1].Trim().Split(" ");
+        CountX = int.Parse(line[0]);
+        CountY = int.Parse(line[1]);
+
+        // Установка коэффициентов разрядки
+        line = interface_str[2].Trim().Split(" ");
+        Kx = double.Parse(line[0]);
+        Ky = double.Parse(line[1]);
+        K_X.Text = Kx.ToString();
+        K_Y.Text = Ky.ToString();
+
+        // Установка минимальных значений
+        line = interface_str[3].Trim().Split(" ");
+        min_step = double.Parse(line[0]);
+        min_count_step = int.Parse(line[1]);
+        Min_step_item.Text = min_step.ToString();
+        Min_Count_step.Text = min_count_step.ToString();
+
+        // Установка строгости сетки
+        line = interface_str[4].Trim().Split(" ");
+        IsStrictGrid = bool.Parse(line[0]);
+        ToggleStrict.IsChecked = IsStrictGrid;
+
+        // Установка краевых значений
+        line = interface_str[5].Trim().Split(" ");
+        SideBound = new int[] { int.Parse(line[0]), int.Parse(line[1]), int.Parse(line[2]), int.Parse(line[3]) };
+        Side0Text.Text = SideBound[0].ToString();
+        Side1Text.Text = SideBound[1].ToString();
+        Side2Text.Text = SideBound[2].ToString();
+        Side3Text.Text = SideBound[3].ToString();
+
+        // Добавление слоев
+        for (int i = 0; i < grid.Layers.Count; i++) {
+            layers_str.Add(grid.Layers[i].ToString());
+            layers.Add(grid.Layers[i]);
+        }
+        layersList.Items.Refresh();
+
+        // Добавление объектов
+        for (int i = 0; i < grid.Items.Count; i++) {
+            items_str.Add(grid.Items[i].Name);
+            items.Add(grid.Items[i]);
+        }
+        itemsList.Items.Refresh();
+    }
+
     //: Построение сетки
     private void CreateGrid() {
 
         // Генерация узлов
-        Node<double>[] nodes = generate_node();
+        List<Node> nodes = generate_node();
 
         // Генерация элементов
-        Elem[] elems = generate_elem();
+        List<Elem> elems = generate_elem();
 
         // Генерация ребер
-        Edge<double>[] edges = generate_edge(elems, nodes);
+        List<Edge> edges = generate_edge(elems, nodes);
 
         // Генерация краевых
-        Bound[] bounds = generate_bound(edges);
+        List<Bound> bounds = generate_bound(edges);
 
-        grid =  new Grid<double>(nodes, edges, elems, bounds);
+        grid =  new Grid(nodes, edges, elems, bounds, items, layers);
     }
-    
+
     //: Рисование сетки
     private void DrawGrid() {
 

@@ -1,179 +1,127 @@
 ﻿namespace FEM.grid;
 
-// % ***** Structure Grid ***** % //
-public struct Grid<T> where T : System.Numerics.INumber<T>
+// % ***** Структура сетки ***** % //
+public struct Grid
 {
-    //: Fields and properties
-    public int Count_Node { get; set; }    /// Общее количество узлов
-    public int Count_Elem { get; set; }    /// Общее количество КЭ
-    public int Count_Kraev { get; set; }    /// Количество краевых
-    public int Count_Edge { get; set; }    /// Количество ребер
+    //: Поля и свойства
+    public int Count_Node  => Nodes.Count;    // Количество узлов
+    public int Count_Elem  => Elems.Count;    // Количество КЭ
+    public int Count_Bound => Bounds.Count;   // Количество краевых
+    public int Count_Edge  => Edges.Count;    // Количество ребер
+    public int Count_Item  => Items.Count;    // Количество объектов
+    public int Count_Layer => Layers.Count;   // Количество слоев
 
-    public Node<T>[] Nodes;      /// Узлы
-    public Elem[] Elems;      /// КЭ
-    public Edge<T>[] Edges;      /// Ребра
-    public Bound[] Bounds;     /// Краевые
+    public List<Node>   Nodes;  // Узлы
+    public List<Elem>   Elems;  // КЭ
+    public List<Edge>   Edges;  // Ребра
+    public List<Bound>  Bounds; // Краевые
+    public List<Item>   Items;  // Объекты
+    public List<double> Layers; // Слои 
 
-    //: Constructor
-    public Grid(Node<T>[] nodes, Edge<T>[] edges, Elem[] elem, Bound[] bounds)
-    {
-        Count_Node = nodes.Length;
-        Count_Edge = edges.Length;
-        Count_Elem = elem.Length;
-        Count_Kraev = bounds.Length;
-        Nodes = nodes;
-        Edges = edges;
-        Elems = elem;
+    //: Конструктор
+    public Grid(List<Node> nodes, List<Edge> edges, List<Elem> elems, List<Bound> bounds, List<Item> items, List<double> layers) {
+        Nodes  = nodes;
+        Edges  = edges;
+        Elems  = elems;
         Bounds = bounds;
+        Items  = items;
+        Layers = layers;
     }
 
-    //: Deconstructor
-    public void Deconstruct(out Node<T>[] nodes,
-                            out Edge<T>[] edges,
-                            out Elem[] elems,
-                            out Bound[] kraevs)
-    {
-        edges = Edges;
-        nodes = Nodes;
-        elems = Elems;
+    //: Записать сетку
+    public void WriteGrid() {
+
+        Directory.CreateDirectory(@"grid");
+
+        // Запись узлов сетки
+        File.WriteAllText(@"grid/nodes.txt", $"{Count_Node} \n" + String.Join("\n", Nodes));
+
+        // Запись КЭ
+        File.WriteAllText(@"grid/elems.txt", $"{Count_Elem} \n" + String.Join("\n", Elems));
+
+        // Записб ребер
+        File.WriteAllText(@"grid/edges.txt", $"{Count_Edge} \n" + String.Join("\n", Edges));
+
+        // Запись краевых
+        File.WriteAllText(@"grid/bounds.txt", $"{Count_Bound} \n" + String.Join("\n", Bounds));
+
+        // Запись объектов
+        File.WriteAllText(@"grid/items.txt", $"{Count_Item} \n" + String.Join("\n", Items));
+
+        // Запись слоев
+        File.WriteAllText(@"grid/layers.txt", $"{Count_Layer} \n" + String.Join("\n", Layers));
+    }
+
+    //: Загрузить сетку
+    public void LoadGrid() {
+
+        // Чтение узлов
+        string[] Fnodes = File.ReadAllLines(@"grid/nodes.txt");
+        Nodes = new List<Node>();
+        for (int i = 1; i < int.Parse(Fnodes[0]) + 1; i++) {
+            var node = Fnodes[i].Trim().Split(" ");
+            Nodes.Add(new Node(double.Parse(node[0]), double.Parse(node[1])));
+        }
+
+        // Чтение элементов
+        string[] FElems = File.ReadAllLines(@"grid/elems.txt");
+        Elems = new List<Elem>();
+        for (int i = 1; i < int.Parse(FElems[0]) + 1; i++) {
+            var elem = FElems[i].Trim().Split(" ");
+            Elems.Add(new Elem(int.Parse(elem[0]), int.Parse(elem[1]), int.Parse(elem[2]), int.Parse(elem[3])));
+            Elems[i - 1] = Elems[i - 1] with { Edge = new int[] { int.Parse(elem[4]), int.Parse(elem[5]), int.Parse(elem[6]), int.Parse(elem[7]) },
+                                               Material = int.Parse(elem[8]) };
+        }
+
+        // Чтение ребер
+        string[] FEdges = File.ReadAllLines(@"grid/edges.txt");
+        Edges = new List<Edge>();
+        for (int i = 1; i < int.Parse(FEdges[0]) + 1; i++) {
+            var edge = FEdges[i].Trim().Split(" ");
+            var node1 = new Node(double.Parse(edge[0]), double.Parse(edge[1]));
+            var node2 = new Node(double.Parse(edge[2]), double.Parse(edge[3]));
+            Edges.Add(new Edge(node1, node2));
+        }
+
+        // Чтение краевых
+        string[] FBounds = File.ReadAllLines(@"grid/bounds.txt");
+        Bounds = new List<Bound>();
+        for (int i = 1; i < int.Parse(FBounds[0]) + 1; i++) {
+            var bound = FBounds[i].Trim().Split(" ");
+            Bounds.Add(new Bound(int.Parse(bound[0]), int.Parse(bound[1]), int.Parse(bound[2])));
+        }
+
+        // Чтение объектов
+        string[] FItems = File.ReadAllLines(@"grid/items.txt");
+        Items = new List<Item>();
+        for (int i = 1; i < int.Parse(FItems[0]) + 1; i++) {
+            var item = FItems[i].Trim().Split(" ");
+            Items.Add(new Item(new Vector<double>(new double[] { double.Parse(item[0]), double.Parse(item[1]) }),
+                               new Vector<double>(new double[] { double.Parse(item[2]), double.Parse(item[3]) }),
+                               int.Parse(item[4]),
+                               int.Parse(item[5]),
+                               item[6]));
+        }
+
+        // Чтение слоев
+        string[] FLayers = File.ReadAllLines(@"grid/layers.txt");
+        Layers = new List<double>();
+        for (int i = 1; i < int.Parse(FLayers[0]) + 1; i++)
+            Layers.Add(double.Parse(FLayers[i]));
+    }
+
+    //: Деконструктор
+    public void Deconstruct(out List<Node>    nodes,
+                            out List<Edge>    edges,
+                            out List<Elem>    elems,
+                            out List<Bound>   kraevs,
+                            out List<Item>    items,
+                            out List<double>  layers) {
+        edges  = Edges;
+        nodes  = Nodes;
+        elems  = Elems;
         kraevs = Bounds;
-    }
-}
-
-// % ***** Structure Node ***** % //
-public struct Node<T> where T : System.Numerics.INumber<T>
-{
-    //: Fields and properties
-    public T X { get; set; }  /// Coordinate X 
-    public T Y { get; set; }  /// Coordinate Y
-
-    //: Constructor
-    public Node(T _X, T _Y)
-    {
-        (X, Y) = (_X, _Y);
-    }
-
-    //: Deconstructor
-    public void Deconstruct(out T x,
-                            out T y)
-    {
-        (x, y) = (X, Y);
-    }
-
-    //: String view structure
-    public override string ToString() { return $"{X} {Y}"; }
-}
-
-// % ***** Structure Edge ***** % //
-public struct Edge<T> where T : System.Numerics.INumber<T>
-{
-    //: Fields and properties
-    public Node<T> NodeBegin { get; set; }  /// The begin node of the edge  
-    public Node<T> NodeEnd { get; set; }  /// The end node of the edge
-
-    //: Constructor
-    public Edge(Node<T> _begin, Node<T> _end)
-    {
-        NodeBegin = _begin;
-        NodeEnd = _end;
-    }
-
-    //: Deconstructor
-    public void Deconstruct(out Node<T> begin,
-                            out Node<T> end)
-    {
-        (begin, end) = (NodeBegin, NodeEnd);
-    }
-
-    //: String view structure
-    public override string ToString() => $"{NodeBegin.ToString()} {NodeEnd.ToString()}";
-}
-
-// % ***** Structure Final Element ***** % //
-public struct Elem
-{
-    //: Fields and properties
-    public int[] Node;   /// Numbers node final element
-    public int[] Edge;   /// Numbers edge final element
-
-    //: Constructor
-    public Elem(params int[] node)
-    {
-        Node = node;
-    }
-
-    //: Deconstructor
-    public void Deconstruct(out int[] nodes,
-                            out int[] edges)
-    {
-        nodes = Node;
-        edges = Edge;
-    }
-
-    //: String view structure
-    public override string ToString()
-    {
-        StringBuilder str_elem = new StringBuilder();
-        str_elem.Append($"{Node[0],0}");
-        for (int i = 1; i < Node.Count(); i++)
-            str_elem.Append($"{Node[i],8}");
-        str_elem.Append($"\t");
-        for (int i = 0; i < Edge.Count(); i++)
-            str_elem.Append($"{Edge[i],8}");
-        return str_elem.ToString();
-    }
-}
-
-// % ***** Structure Bound ***** % //
-public struct Bound
-{
-    //: Fields and properties
-    public int Edge { get; set; }   /// Number edge
-    public int NumBound { get; set; }   /// Number bound
-    public int NumSide { get; set; }   /// Number side
-
-    //: Constructor
-    public Bound(int num, int side, int edge)
-    {
-        NumBound = num;
-        NumSide = side;
-        Edge = edge;
-    }
-
-    //: Deconstructor
-    public void Deconstruct(out int num, out int side, out int edge)
-    {
-        num = NumBound;
-        side = NumSide;
-        edge = Edge;
-    }
-
-    //: String view structure
-    public override string ToString()
-    {
-        StringBuilder str_elem = new StringBuilder();
-        str_elem.Append($"{NumBound,0} {NumSide,3} {Edge,5}");
-        return str_elem.ToString();
-    }
-}
-
-// % ***** Structure Item ***** % //
-public struct Item
-{
-    //: Fields and properties
-    public Vector<double> Begin { get; set; }
-    public Vector<double> End { get; set; }
-    public int Nx { get; set; }
-    public int Ny { get; set; }
-    public string Name { get; set; }
-
-    //: Constructor
-    public Item(Vector<double> begin, Vector<double> end, int nx, int ny, string name = "None")
-    {
-        Begin = (Vector<double>)begin.Clone();
-        End = (Vector<double>)end.Clone();
-        Nx = nx;
-        Ny = ny;
-        Name = name;
+        items  = Items;
+        layers = Layers;
     }
 }

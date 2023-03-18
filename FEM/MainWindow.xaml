@@ -33,12 +33,12 @@
                 Grid.RowSpan="2"
                 Background="#FFC4C4C8">
 
-            <!-- % ***** Надпись ***** % -->
-            <TextBlock Canvas.Left="85" 
+            <!-- % ***** Надпись "Панель инструментов" ***** % -->
+            <TextBlock Canvas.Left="85"
+                       Canvas.Top="3"
                        TextWrapping="Wrap" 
                        Text="Панель инструментов"
-                       FontSize="18"
-                       Canvas.Top="3"/>
+                       FontSize="18"/>
 
             <!--Separator-->
             <StackPanel Orientation="Horizontal" Canvas.Top="15">
@@ -58,11 +58,10 @@
                                    Text="X:"/>
                         <TextBox x:Name="Begin_BG_X"
                                  Padding="2"
-                                 TextWrapping="NoWrap"
                                  Text="0"
                                  TextAlignment="Center"
                                  Width="100"
-                                 PreviewTextInput="PreviewTextInput"/>
+                                 PreviewTextInput="PreviewTextInputDouble"/>
                     </DockPanel>
                     <DockPanel>
                         <TextBlock FontSize="16"
@@ -70,11 +69,10 @@
                                    Text="Y:"/>
                         <TextBox x:Name="Begin_BG_Y"
                                  Padding="2"
-                                 TextWrapping="NoWrap"
                                  Text="0"
                                  TextAlignment="Center"
                                  Width="100"
-                                 PreviewTextInput="PreviewTextInput"/>
+                                 PreviewTextInput="PreviewTextInputDouble"/>
                     </DockPanel>
                 </DockPanel>
             </StackPanel>
@@ -92,11 +90,10 @@
                                    Text="X:"/>
                         <TextBox x:Name="End_BG_X"
                                  Padding="2"
-                                 TextWrapping="NoWrap"
                                  Text="0"
                                  TextAlignment="Center"
                                  Width="100"
-                                 PreviewTextInput="PreviewTextInput"/>
+                                 PreviewTextInput="PreviewTextInputDouble"/>
                     </DockPanel>
                     <DockPanel>
                         <TextBlock FontSize="16"
@@ -104,11 +101,10 @@
                                    Text="Y:"/>
                         <TextBox x:Name="End_BG_Y"
                                  Padding="2"
-                                 TextWrapping="NoWrap"
                                  Text="0"
                                  TextAlignment="Center"
                                  Width="100"
-                                 PreviewTextInput="PreviewTextInput"/>
+                                 PreviewTextInput="PreviewTextInputDouble"/>
                     </DockPanel>
                 </DockPanel>
             </StackPanel>
@@ -119,11 +115,11 @@
             </StackPanel>
 
             <!-- % ***** Надпись ***** % -->
-            <TextBlock Canvas.Left="105" 
-                       TextWrapping="Wrap" 
+            <TextBlock Canvas.Left="105"
+                       Canvas.Top="120"
+                       TextWrapping="Wrap"
                        Text="Добавление объектов:"
-                       FontSize="16"
-                       Canvas.Top="120"/>
+                       FontSize="16"/>
 
             <!-- % ***** Левая-Нижняя точка (Малого поля) ***** % -->
             <StackPanel Canvas.Top="140"
@@ -138,11 +134,10 @@
                                    Text="X:"/>
                         <TextBox x:Name="Begin_SML_X"
                                  Padding="2"
-                                 TextWrapping="NoWrap"
                                  Text="0"
                                  TextAlignment="Center"
                                  Width="100"
-                                 PreviewTextInput="PreviewTextInput"/>
+                                 PreviewTextInput="PreviewTextInputDouble"/>
                     </DockPanel>
                     <DockPanel>
                         <TextBlock FontSize="16"
@@ -150,11 +145,10 @@
                                    Text="Y:"/>
                         <TextBox x:Name="Begin_SML_Y"
                                  Padding="2"
-                                 TextWrapping="NoWrap"
                                  Text="0"
                                  TextAlignment="Center"
                                  Width="100"
-                                 PreviewTextInput="PreviewTextInput"/>
+                                 PreviewTextInput="PreviewTextInputDouble"/>
                     </DockPanel>
                 </DockPanel>
             </StackPanel>
@@ -172,11 +166,10 @@
                                    Text="X:"/>
                         <TextBox x:Name="End_SML_X"
                                  Padding="2"
-                                 TextWrapping="NoWrap"
                                  Text="0"
                                  TextAlignment="Center"
                                  Width="100"
-                                 PreviewTextInput="PreviewTextInput"/>
+                                 PreviewTextInput="PreviewTextInputDouble"/>
                     </DockPanel>
                     <DockPanel>
                         <TextBlock FontSize="16"
@@ -184,11 +177,10 @@
                                    Text="Y:"/>
                         <TextBox x:Name="End_SML_Y"
                                  Padding="2"
-                                 TextWrapping="NoWrap"
                                  Text="0"
                                  TextAlignment="Center"
                                  Width="100"
-                                 PreviewTextInput="PreviewTextInput"/>
+                                 PreviewTextInput="PreviewTextInputDouble"/>
                     </DockPanel>
                 </DockPanel>
             </StackPanel>
@@ -201,7 +193,6 @@
                            Text="Количество разбиений по объекту (Ox)"/>
                 <TextBox x:Name="N_X"
                          Padding="2"
-                         TextWrapping="NoWrap"
                          Text="6"
                          TextAlignment="Center"
                          Width="50"
@@ -216,7 +207,6 @@
                            Text="Количество разбиений по объекту (Oy)"/>
                 <TextBox x:Name="N_Y"
                          Padding="2"
-                         TextWrapping="NoWrap"
                          Text="6"
                          TextAlignment="Center"
                          Width="50"
@@ -237,7 +227,6 @@
                         <TextBox x:Name="TextItem"
                              Padding="2"
                              Margin="02"
-                             TextWrapping="NoWrap"
                              TextAlignment="Center"
                              Width="100"
                              PreviewTextInput="PreviewTextInputName"/>
@@ -287,11 +276,10 @@
                            Text="Мин. шаг по объекту: "/>
                 <TextBox x:Name="Min_step_item"
                          Padding="2"
-                         TextWrapping="NoWrap"
                          Text="0.01"
                          TextAlignment="Center"
                          Width="50"
-                         PreviewTextInput="PreviewTextInput"/>
+                         PreviewTextInput="PreviewTextInputDouble"/>
             </DockPanel>
 
             <!-- % ***** Минимальное количество шагов по объекту ***** % -->
@@ -302,7 +290,6 @@
                            Text="Мин. количество шагов по объекту: "/>
                 <TextBox x:Name="Min_Count_step"
                          Padding="2"
-                         TextWrapping="NoWrap"
                          Text="5"
                          TextAlignment="Center"
                          Width="50"
@@ -317,11 +304,10 @@
                            Text="Коэффициент разрядки от объекта (ОX):"/>
                 <TextBox x:Name="K_X"
                          Padding="2"
-                         TextWrapping="NoWrap"
                          Text="1.2"
                          TextAlignment="Center"
                          Width="40"
-                         PreviewTextInput="PreviewTextInput"/>
+                         PreviewTextInput="PreviewTextInputDouble"/>
             </DockPanel>
 
             <!-- % ***** Коэффициент разрядки от объекта (ОY) ***** % -->
@@ -332,11 +318,10 @@
                            Text="Коэффициент разрядки от объекта (ОY):"/>
                 <TextBox x:Name="K_Y"
                          Padding="2"
-                         TextWrapping="NoWrap"
                          Text="1.2"
                          TextAlignment="Center"
                          Width="40"
-                         PreviewTextInput="PreviewTextInput"/>
+                         PreviewTextInput="PreviewTextInputDouble"/>
             </DockPanel>
 
             <!--Separator-->
@@ -365,7 +350,7 @@
                              TextWrapping="NoWrap"
                              TextAlignment="Center"
                              Width="100"
-                             PreviewTextInput="PreviewTextInput"/>
+                             PreviewTextInput="PreviewTextInputDouble"/>
                     </DockPanel>
                     <Button Content="Добавить слой"
                             Click="AddLayer_Click"
@@ -399,7 +384,6 @@
                     <TextBox x:Name="Side0Text"
                              Margin="10,0,50,0"
                              Padding="2"
-                             TextWrapping="NoWrap"
                              Text="1"
                              TextAlignment="Center"
                              Width="50"
@@ -411,7 +395,6 @@
                     <TextBox x:Name="Side1Text"
                              Margin="10,0,0,0"
                              Padding="2"
-                             TextWrapping="NoWrap"
                              Text="1"
                              TextAlignment="Center"
                              Width="50"
@@ -428,7 +411,6 @@
                     <TextBox x:Name="Side2Text"
                              Margin="10,0,50,0"
                              Padding="2"
-                             TextWrapping="NoWrap"
                              Text="1"
                              TextAlignment="Center"
                              Width="50"
@@ -440,7 +422,6 @@
                     <TextBox x:Name="Side3Text"
                              Margin="10,0,0,0"
                              Padding="2"
-                             TextWrapping="NoWrap"
                              Text="1"
                              TextAlignment="Center"
                              Width="50"
