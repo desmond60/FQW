@@ -23,9 +23,11 @@ global using static System.Math;
 global using Numerics;
 global using FEM.grid;
 global using FEM.slau;
+global using FEM.other;
 
 // Project-static
 global using static FEM.other.Helper;
 
 // Alias
 global using Grid = FEM.grid.Grid;
+global using Complex = System.Numerics.Complex;

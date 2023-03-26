@@ -447,7 +447,8 @@ public partial class MainWindow : Window
                 edges[bottom] = new Edge(nodes[elems[n_elem].Node[0]], nodes[elems[n_elem].Node[1]]);
                 edges[top]    = new Edge(nodes[elems[n_elem].Node[2]], nodes[elems[n_elem].Node[3]]);
 
-                elems[n_elem] = elems[n_elem] with { Edge = new[] { left, right, bottom, top } };
+                elems[n_elem] = elems[n_elem] with { Edge = new[] { left, right, bottom, top },
+                                                     Material = Helper.GetNumberMaterial(layers, nodes[elems[n_elem].Node[0]].Y) };
             }
 
         return new List<Edge>(edges);

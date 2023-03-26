@@ -88,6 +88,8 @@ public partial class MainWindow
         string Name = TextItem.Text;
 
         items[index] = new Item(Begin_SML, End_SML, Nx, Ny, Name);
+        items_str[index] = Name;
+        itemsList.Items.Refresh();
     }
 
 
@@ -121,7 +123,6 @@ public partial class MainWindow
         }
 
         Solver solver = new Solver();
-        solver.Topmost = true;
         solver.Show();
     }
 }

@@ -18,6 +18,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <complex>
 using namespace std;
 
 #include <time.h>
@@ -26,5 +27,6 @@ using namespace std;
 
 
 #include "mkl.h"
+#include "mkl_types.h"
 
 

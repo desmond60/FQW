@@ -15,4 +15,16 @@ public static class Helper
 
         return result;
     }
+
+    //: Определение номера материала
+    public static int GetNumberMaterial(List<double> layers, double value) {
+        int result = 1;
+
+        for (int i = 0; i < layers.Count; i++) {
+            if (value > 0) return 1;
+            if (value < layers[i]) result++;
+        }
+
+        return result;
+    }
 }

@@ -4,13 +4,6 @@
 public struct Grid
 {
     //: Поля и свойства
-    public int Count_Node  => Nodes.Count;    // Количество узлов
-    public int Count_Elem  => Elems.Count;    // Количество КЭ
-    public int Count_Bound => Bounds.Count;   // Количество краевых
-    public int Count_Edge  => Edges.Count;    // Количество ребер
-    public int Count_Item  => Items.Count;    // Количество объектов
-    public int Count_Layer => Layers.Count;   // Количество слоев
-
     public List<Node>   Nodes;  // Узлы
     public List<Elem>   Elems;  // КЭ
     public List<Edge>   Edges;  // Ребра
@@ -32,24 +25,27 @@ public struct Grid
     public void WriteGrid() {
 
         Directory.CreateDirectory(@"grid");
+        Directory.CreateDirectory(@"slau/slauTXT");
+        Directory.CreateDirectory(@"slau/slauBIN");
+        Directory.CreateDirectory(@"harm1d");
 
         // Запись узлов сетки
-        File.WriteAllText(@"grid/nodes.txt", $"{Count_Node} \n" + String.Join("\n", Nodes));
+        File.WriteAllText(@"grid/nodes.txt", $"{Nodes.Count} \n" + String.Join("\n", Nodes), Encoding.UTF8);
 
         // Запись КЭ
-        File.WriteAllText(@"grid/elems.txt", $"{Count_Elem} \n" + String.Join("\n", Elems));
+        File.WriteAllText(@"grid/elems.txt", $"{Elems.Count} \n" + String.Join("\n", Elems), Encoding.UTF8);
 
         // Записб ребер
-        File.WriteAllText(@"grid/edges.txt", $"{Count_Edge} \n" + String.Join("\n", Edges));
+        File.WriteAllText(@"grid/edges.txt", $"{Edges.Count} \n" + String.Join("\n", Edges), Encoding.UTF8);
 
         // Запись краевых
-        File.WriteAllText(@"grid/bounds.txt", $"{Count_Bound} \n" + String.Join("\n", Bounds));
+        File.WriteAllText(@"grid/bounds.txt", $"{Bounds.Count} \n" + String.Join("\n", Bounds), Encoding.UTF8);
 
         // Запись объектов
-        File.WriteAllText(@"grid/items.txt", $"{Count_Item} \n" + String.Join("\n", Items));
+        File.WriteAllText(@"grid/items.txt", $"{Items.Count} \n" + String.Join("\n", Items), Encoding.UTF8);
 
         // Запись слоев
-        File.WriteAllText(@"grid/layers.txt", $"{Count_Layer} \n" + String.Join("\n", Layers));
+        File.WriteAllText(@"grid/layers.txt", $"{Layers.Count} \n" + String.Join("\n", Layers), Encoding.UTF8);
     }
 
     //: Загрузить сетку
