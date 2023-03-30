@@ -14,12 +14,12 @@ public struct Harm1D
     }
 
     //: Запись данных для одномерной задачи
-    public void WriteFileHarm1D(List<double> layers, double nu, List<double> sigmas) {
+    public void WriteFileHarm1D(List<Layer> layers, double nu) {
 
         // Заполнение файла sreda1d.ay
         var sreda_str = new StringBuilder($"{layers.Count}\n");
         for (int i = 1; i < layers.Count + 1; i++)
-            sreda_str.Append($"{layers[^i]} {1e-2.ToString("E")} {1}\n");
+            sreda_str.Append($"{layers[^i].Y} {1e-2.ToString("E")} {1}\n");
         sreda_str.Append(
         """
          -100000000.000000 3
@@ -35,8 +35,9 @@ public struct Harm1D
 
         // Заполнение файла sig3d
         var sig3d_str = new StringBuilder();
-        for (int i = 0; i < layers.Count + 1; i++)
-            sig3d_str.Append($"{i + 1} {0.ToString("E")} {sigmas[i].ToString("E")}\n");
+        sig3d_str.Append($"{1} {0.ToString("E")} {0.ToString("E")}\n");
+        for (int i = 1; i < layers.Count + 1; i++)
+            sig3d_str.Append($"{i + 1} {0.ToString("E")} {layers[^i].Sigma.ToString("E")}\n");
         File.WriteAllText(@"harm1D\sig3d", sig3d_str.ToString());
 
         // Заполнение файла nu

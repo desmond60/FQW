@@ -1,4 +1,6 @@
-﻿namespace FEM;
+﻿using System.Collections.Generic;
+
+namespace FEM;
 
 //: Построение сетки
 public partial class MainWindow : Window
@@ -35,13 +37,7 @@ public partial class MainWindow : Window
         border_Y = border_Y.OrderByDescending(n => n).Distinct().ToList();
 
         // Сортировка по X
-        for (int write = 0; write < items.Count; write++)
-            for (int sort = 0; sort < items.Count - 1; sort++)
-                if (items[sort].Begin[0] > items[sort + 1].Begin[0]) {
-                    Item temp = items[sort + 1] with { };
-                    items[sort + 1] = items[sort] with { };
-                    items[sort] = temp with { };
-                }
+        items = items.OrderBy(n => n.Begin[0]).ToList();
 
         // Список индексов объектов (нужен чтобы пропускать пройденные объекты)
         List<int> index_list = new List<int>() { 0 };
@@ -115,15 +111,8 @@ public partial class MainWindow : Window
             }
         }
 
-
         // Сортировка по Y
-        for (int write = 0; write < items.Count; write++)
-            for (int sort = 0; sort < items.Count - 1; sort++)
-                if (items[sort].Begin[1] > items[sort + 1].Begin[1]) {
-                    Item temp = items[sort + 1] with { };
-                    items[sort + 1] = items[sort] with { };
-                    items[sort] = temp with { };
-                }
+        items = items.OrderBy(n => n.Begin[1]).ToList();
 
         // Составляем листы шагов Y
         List<double> H_Axe_Y = new List<double>();
@@ -356,14 +345,14 @@ public partial class MainWindow : Window
                 Y_temp += H_Axe_Y[i];
 
                 // Если равно значит узлы будут стоять на узлы, переходим у следующему слою
-                if (Abs(Y_temp - layers[^id]) <= 1e-6) {
+                if (Abs(Y_temp - layers[^id].Y) <= 1e-6) {
                     id++;
                     continue;
                 }
 
                 // Если перескочили слой, значит добавим шаг в чтобы задеть слой
-                if (Y_temp > layers[^id]) {
-                    new_Axe.Add((i + new_Axe.Count, layers[^id], Y_temp - H_Axe_Y[i]));
+                if (Y_temp > layers[^id].Y) {
+                    new_Axe.Add((i + new_Axe.Count, layers[^id].Y, Y_temp - H_Axe_Y[i]));
                     id++;
                 }
             }
@@ -448,7 +437,7 @@ public partial class MainWindow : Window
                 edges[top]    = new Edge(nodes[elems[n_elem].Node[2]], nodes[elems[n_elem].Node[3]]);
 
                 elems[n_elem] = elems[n_elem] with { Edge = new[] { left, right, bottom, top },
-                                                     Material = Helper.GetNumberMaterial(layers, nodes[elems[n_elem].Node[0]].Y) };
+                                                     Material = Helper.GetMaterial(layers, items, nodes, elems[n_elem]) };
             }
 
         return new List<Edge>(edges);
@@ -496,5 +485,23 @@ public partial class MainWindow : Window
         bounds = bounds.OrderByDescending(n => n.NumBound).ToArray();
 
         return new List<Bound>(bounds);
+    }
+
+    //: Генерация проводимости
+    private List<(double Sigma1D, double Sigma2D)> generate_sigma() {
+
+        // Воздух
+        List<(double Sigma1D, double Sigma2D)> sigmas = new List<(double Sigma1D, double Sigma2D)>(new(double, double)[] { (0, 0) });
+
+        for (int i = 0; i < layers.Count; i++) {
+            sigmas.Add((layers[i].Sigma, layers[i].Sigma));
+
+            // Ищем индексы объектов которые находятся в слое
+            int[] id = GetIdItems(items, layers, i);
+            for (int j = 0; j < id.Length; j++)
+                sigmas.Add((layers[i].Sigma, items[id[j]].Sigma));
+        }
+
+        return sigmas;
     }
 }

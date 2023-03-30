@@ -13,18 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Файлы ресурсов\files">
-      <UniqueIdentifier>{fbf75516-15bb-4f14-9e6a-8afc0a7c6a2a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Файлы ресурсов\test">
-      <UniqueIdentifier>{d0a05b9c-8a8d-4b8e-808b-95b9ca8a765d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Файлы ресурсов\test2">
-      <UniqueIdentifier>{adb0de4b-76bc-42b6-917b-daa0aef59973}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Файлы ресурсов\test3">
-      <UniqueIdentifier>{9ccf8899-a61c-4960-a21e-9028cf822516}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pardiso.cpp">
@@ -35,79 +23,5 @@
     <ClInclude Include="stdafx.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="files\di">
-      <Filter>Файлы ресурсов\files</Filter>
-    </None>
-    <None Include="files\gg">
-      <Filter>Файлы ресурсов\files</Filter>
-    </None>
-    <None Include="files\ig">
-      <Filter>Файлы ресурсов\files</Filter>
-    </None>
-    <None Include="files\jg">
-      <Filter>Файлы ресурсов\files</Filter>
-    </None>
-    <None Include="files\kuslau">
-      <Filter>Файлы ресурсов\files</Filter>
-    </None>
-    <None Include="files\pr">
-      <Filter>Файлы ресурсов\files</Filter>
-    </None>
-    <None Include="test\di">
-      <Filter>Файлы ресурсов\test</Filter>
-    </None>
-    <None Include="test\gg">
-      <Filter>Файлы ресурсов\test</Filter>
-    </None>
-    <None Include="test\ig">
-      <Filter>Файлы ресурсов\test</Filter>
-    </None>
-    <None Include="test\jg">
-      <Filter>Файлы ресурсов\test</Filter>
-    </None>
-    <None Include="test\pr">
-      <Filter>Файлы ресурсов\test</Filter>
-    </None>
-    <None Include="test\kuslau">
-      <Filter>Файлы ресурсов\test</Filter>
-    </None>
-    <None Include="test2\di">
-      <Filter>Файлы ресурсов\test2</Filter>
-    </None>
-    <None Include="test2\gg">
-      <Filter>Файлы ресурсов\test2</Filter>
-    </None>
-    <None Include="test2\ig">
-      <Filter>Файлы ресурсов\test2</Filter>
-    </None>
-    <None Include="test2\jg">
-      <Filter>Файлы ресурсов\test2</Filter>
-    </None>
-    <None Include="test2\pr">
-      <Filter>Файлы ресурсов\test2</Filter>
-    </None>
-    <None Include="test2\kuslau">
-      <Filter>Файлы ресурсов\test2</Filter>
-    </None>
-    <None Include="test3\di">
-      <Filter>Файлы ресурсов\test3</Filter>
-    </None>
-    <None Include="test3\gg">
-      <Filter>Файлы ресурсов\test3</Filter>
-    </None>
-    <None Include="test3\ig">
-      <Filter>Файлы ресурсов\test3</Filter>
-    </None>
-    <None Include="test3\jg">
-      <Filter>Файлы ресурсов\test3</Filter>
-    </None>
-    <None Include="test3\kuslau">
-      <Filter>Файлы ресурсов\test3</Filter>
-    </None>
-    <None Include="test3\pr">
-      <Filter>Файлы ресурсов\test3</Filter>
-    </None>
   </ItemGroup>
 </Project>

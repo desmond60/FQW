@@ -9,7 +9,7 @@ public class FEM
     private List<Elem>    Elems;   // КЭ
     private List<Bound>   Bounds;  // Краевые
     private List<Item>    Items;   // Объекты
-    private List<double>  Layers;  // Слои
+    private List<Layer>   Layers;  // Слои
     private SLAU          slau;    // Структура СЛАУ
 
     public Vector<double> Receivers { get; set; }   // Значения приемников

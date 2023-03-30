@@ -9,16 +9,18 @@ public struct Item
     public int            Nx    { get; set; }  // Количество разбиений по Оси X
     public int            Ny    { get; set; }  // Количество разбиений по Оси Y
     public string         Name  { get; set; }  // Имя объекта
+    public double         Sigma { get; set; }  // Значение проводимости
 
     //: Конструктор
-    public Item(Vector<double> begin, Vector<double> end, int nx, int ny, string name) {
-        Begin = (Vector<double>)begin.Clone();
-        End   = (Vector<double>)end.Clone();
-        Nx    = nx;
-        Ny    = ny;
-        Name  = name;
+    public Item(Vector<double> begin, Vector<double> end, int nx, int ny, double sigma, string name) {
+        this.Begin = (Vector<double>)begin.Clone();
+        this.End   = (Vector<double>)end.Clone();
+        this.Nx    = nx;
+        this.Ny    = ny;
+        this.Sigma = sigma;
+        this.Name  = name;
     }
 
     //: Строковое представление объекта
-    public override string ToString() => $"{Begin[0]} {Begin[1]} {End[0]} {End[1]} {Nx} {Ny} {Name}";
+    public override string ToString() => $"{Begin[0]} {Begin[1]} {End[0]} {End[1]} {Nx} {Ny} {Sigma} {Name}";
 }

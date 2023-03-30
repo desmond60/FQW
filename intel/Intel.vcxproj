@@ -24,32 +24,6 @@
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="files\di" />
-    <None Include="files\gg" />
-    <None Include="files\ig" />
-    <None Include="files\jg" />
-    <None Include="files\kuslau" />
-    <None Include="files\pr" />
-    <None Include="test2\di" />
-    <None Include="test2\gg" />
-    <None Include="test2\ig" />
-    <None Include="test2\jg" />
-    <None Include="test2\kuslau" />
-    <None Include="test2\pr" />
-    <None Include="test3\di" />
-    <None Include="test3\gg" />
-    <None Include="test3\ig" />
-    <None Include="test3\jg" />
-    <None Include="test3\kuslau" />
-    <None Include="test3\pr" />
-    <None Include="test\di" />
-    <None Include="test\gg" />
-    <None Include="test\ig" />
-    <None Include="test\jg" />
-    <None Include="test\kuslau" />
-    <None Include="test\pr" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

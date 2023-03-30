@@ -9,16 +9,18 @@ public struct Grid
     public List<Edge>   Edges;  // Ребра
     public List<Bound>  Bounds; // Краевые
     public List<Item>   Items;  // Объекты
-    public List<double> Layers; // Слои 
+    public List<Layer>  Layers; // Слои
+    public List<(double Sigma1D, double Sigma2D)> Sigmas; // Значения проводимости
 
     //: Конструктор
-    public Grid(List<Node> nodes, List<Edge> edges, List<Elem> elems, List<Bound> bounds, List<Item> items, List<double> layers) {
+    public Grid(List<Node> nodes, List<Edge> edges, List<Elem> elems, List<Bound> bounds, List<Item> items, List<Layer> layers, List<(double, double)> sigmas) {
         Nodes  = nodes;
         Edges  = edges;
         Elems  = elems;
         Bounds = bounds;
         Items  = items;
         Layers = layers;
+        Sigmas = sigmas;
     }
 
     //: Записать сетку
@@ -46,6 +48,9 @@ public struct Grid
 
         // Запись слоев
         File.WriteAllText(@"grid/layers.txt", $"{Layers.Count} \n" + String.Join("\n", Layers), Encoding.UTF8);
+
+        // Запись проводимости
+        File.WriteAllText(@"grid/sigmas.txt", $"{Sigmas.Count} \n" + String.Join("\n", Sigmas.Select(n => n.Sigma1D + " " + n.Sigma2D)), Encoding.UTF8);
     }
 
     //: Загрузить сетку
@@ -96,14 +101,25 @@ public struct Grid
                                new Vector<double>(new double[] { double.Parse(item[2]), double.Parse(item[3]) }),
                                int.Parse(item[4]),
                                int.Parse(item[5]),
-                               item[6]));
+                               double.Parse(item[6]),
+                               item[7]));
         }
 
         // Чтение слоев
         string[] FLayers = File.ReadAllLines(@"grid/layers.txt");
-        Layers = new List<double>();
-        for (int i = 1; i < int.Parse(FLayers[0]) + 1; i++)
-            Layers.Add(double.Parse(FLayers[i]));
+        Layers = new List<Layer>();
+        for (int i = 1; i < int.Parse(FLayers[0]) + 1; i++) {
+            var layer = FLayers[i].Trim().Split(" ");
+            Layers.Add(new Layer(double.Parse(layer[0]), double.Parse(layer[1])));
+        }
+
+        // Чтение проводимости
+        string[] FSigmas = File.ReadAllLines(@"grid/sigmas.txt");
+        Sigmas = new List<(double Sigma1D, double Sigma2D)>();
+        for (int i = 1; i < int.Parse(FSigmas[0]) + 1; i++) {
+            var sigma = FSigmas[i].Trim().Split(" ");
+            Sigmas.Add((double.Parse(sigma[0]), double.Parse(sigma[1])));
+        }
     }
 
     //: Деконструктор
@@ -112,7 +128,7 @@ public struct Grid
                             out List<Elem>    elems,
                             out List<Bound>   kraevs,
                             out List<Item>    items,
-                            out List<double>  layers) {
+                            out List<Layer>  layers) {
         edges  = Edges;
         nodes  = Nodes;
         elems  = Elems;

@@ -5,8 +5,8 @@
         WindowStartupLocation="CenterScreen"
         
         Title="Solver"
-        Height="656" Width="800"
-        MinHeight="656" MinWidth="800"
+        Height="656" Width="650"
+        MinHeight="656" MinWidth="650"
     
         FontFamily="Times New Roman" 
         FontWeight="Bold" FontSize="14">
@@ -83,43 +83,16 @@
             </DockPanel>
 
             <!-- % ***** Надпись ***** % -->
-            <TextBlock Canvas.Left="400"
+            <TextBlock Canvas.Left="380"
                        Canvas.Top="50"
                        TextWrapping="Wrap" 
-                       Text="Добавление проводимости:"
+                       Text="Значения проводимости:"
                        FontSize="16"/>
 
             <!-- % ***** Добавление и удаление приемников ***** % -->
             <DockPanel Canvas.Top="80"
                        Canvas.Left="350">
-                <ListBox x:Name="sigmaList"  Width="215"  Height="100"
-                         SelectionChanged="sigmaList_SelectionChanged"/>
-                <StackPanel>
-                    <DockPanel>
-                        <TextBlock Margin="2"
-                                   FontSize="16"
-                                   Text="Значение 1D: "/>
-                        <TextBox x:Name="Sigma1DBox"
-                                 Padding="2"
-                                 TextAlignment="Center"
-                                 Width="100"
-                                 PreviewTextInput="PreviewTextInputDouble"/>
-                    </DockPanel>
-                    <DockPanel>
-                        <TextBlock Margin="2"
-                                   FontSize="16"
-                                   Text="Значение 2D: "/>
-                        <TextBox x:Name="Sigma2DBox"
-                                 Padding="2"
-                                 TextAlignment="Center"
-                                 Width="100"
-                                 PreviewTextInput="PreviewTextInputDouble"/>
-                    </DockPanel>
-                    <Button Content="Изменить проводимость"
-                            Click="EditSigma_Click"
-                            Margin="2"
-                            Width="180"/>
-                </StackPanel>
+                <ListBox x:Name="sigmaList"  Width="260"  Height="100"/>
             </DockPanel>
 
             <StackPanel Canvas.Top="400">

@@ -24,7 +24,7 @@ public partial class MainWindow : Window
 
     List<string> layers_str  = new List<string>();   // Горизонтальные слои для ListBox
     List<string> items_str   = new List<string>();   // Объекты для  ListBox
-    List<double> layers      = new List<double>();   // Горизонтальные слои
+    List<Layer> layers       = new List<Layer>();    // Горизонтальные слои
     List<Item> items         = new List<Item>();     // Объекты на сетке
     int[] SideBound;                                 // Номера краевых на сторонах
     Grid grid;                                       // Структура сетки
@@ -38,7 +38,12 @@ public partial class MainWindow : Window
         End_BG[0]    = Double.Parse(End_BG_X.Text);
         End_BG[1]    = Double.Parse(End_BG_Y.Text);
 
-        layers = new List<double>(layers_str.Select(n => double.Parse(n)).OrderByDescending(n => n));
+        layers = new List<Layer>();
+        for (int i = 0; i < layers_str.Count; i++) {
+            var layer = layers_str[i].Split(" ");
+            layers.Add(new Layer(double.Parse(layer[0]), double.Parse(layer[1])));
+        }
+        layers = layers.OrderByDescending(n => n.Y).ToList();
 
         min_step = Double.Parse(Min_step_item.Text);
         min_count_step = Int32.Parse(Min_Count_step.Text);
@@ -123,7 +128,7 @@ public partial class MainWindow : Window
 
         // Добавление объектов
         for (int i = 0; i < grid.Items.Count; i++) {
-            items_str.Add(grid.Items[i].Name);
+            items_str.Add(grid.Items[i].Name + " " + grid.Items[i].Sigma);
             items.Add(grid.Items[i]);
         }
         itemsList.Items.Refresh();
@@ -144,7 +149,10 @@ public partial class MainWindow : Window
         // Генерация краевых
         List<Bound> bounds = generate_bound(edges);
 
-        grid =  new Grid(nodes, edges, elems, bounds, items, layers);
+        // Генерация проводимости
+        List<(double, double)> sigmas = generate_sigma();
+
+        grid =  new Grid(nodes, edges, elems, bounds, items, layers, sigmas);
     }
 
     //: Рисование сетки

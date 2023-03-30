@@ -18,14 +18,4 @@ public partial class Solver
             WBox.Text = $"({W.ToString("F4")})";
         }
     }
-
-    //: Обработчик выбора в ListBox значения проводимости
-    private void sigmaList_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-        
-        if ((string)sigmaList.SelectedValue != null) {
-            string[] name = ((string)sigmaList.SelectedValue).Trim().Split(" ");
-            Sigma1DBox.Text = name[3];
-            Sigma2DBox.Text = name[6];
-        }
-    }
 }

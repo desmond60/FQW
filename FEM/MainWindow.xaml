@@ -7,8 +7,8 @@
         WindowStartupLocation="CenterScreen"
         
         Title="DrawGrid"
-        Height="720" Width="1280"
-        MinHeight="800" MinWidth="1280"
+        Height="820" Width="1280"
+        MinHeight="820" MinWidth="1280"
     
         FontFamily="Times New Roman" 
         FontWeight="Bold" FontSize="14">
@@ -214,45 +214,56 @@
             </DockPanel>
 
             <!-- % ***** Добавление и удаление объектов ***** % -->
-            <DockPanel Canvas.Top="285"
+            <DockPanel Canvas.Top="283"
                        Canvas.Left="15">
                 <ListBox x:Name="itemsList" 
-                         Width="100"  Height="100"
+                         Width="130"  Height="110"
                          SelectionChanged="itemsList_SelectionChanged"/>
                 <StackPanel>
                     <DockPanel>
                         <TextBlock Margin="2"
                            FontSize="16"
-                           Text="Название: "/>
+                           Text="Название:   "/>
                         <TextBox x:Name="TextItem"
                              Padding="2"
-                             Margin="02"
+                             Margin="2"
                              TextAlignment="Center"
                              Width="100"
                              PreviewTextInput="PreviewTextInputName"/>
                     </DockPanel>
+                    <DockPanel>
+                        <TextBlock Margin="2"
+                           FontSize="16"
+                           Text="Значение &#963;: "/>
+                        <TextBox x:Name="TextItemSigma"
+                             Padding="2"
+                             Margin="2"
+                             TextAlignment="Center"
+                             Width="100"
+                             PreviewTextInput="PreviewTextInputDouble"/>
+                    </DockPanel>
                     <Button Content="Добавить объект"
-                            Click="AddItem_Click"
                             Margin="2"
+                            Click="AddItem_Click"
                             Width="130"/>
                     <Button Content="Изменить объект"
-                            Click="EditItem_Click"
                             Margin="2"
+                            Click="EditItem_Click"
                             Width="130"/>
                     <Button Content="Удалить объект"
-                            Click="RemoveItem_Click"
                             Margin="2"
+                            Click="RemoveItem_Click"
                             Width="130"/>
                 </StackPanel>
             </DockPanel>
 
             <!--Separator-->
-            <StackPanel Orientation="Horizontal" Canvas.Top="380">
+            <StackPanel Orientation="Horizontal" Canvas.Top="400">
                 <Separator Height="15" Width="350"/>
             </StackPanel>
 
             <!-- % ***** Toggle (Строгая сетка) ***** % -->
-            <DockPanel Canvas.Top="390"
+            <DockPanel Canvas.Top="410"
                        Canvas.Left="5"
                        Width="330">
                 <TextBlock Margin="5,2,0,2"
@@ -269,7 +280,7 @@
             </DockPanel>
 
             <!-- % ***** Минимальный шаг по объекту ***** % -->
-            <DockPanel Canvas.Top="415"
+            <DockPanel Canvas.Top="435"
                        Canvas.Left="5">
                 <TextBlock Margin="5,2,0,2"
                            FontSize="16"
@@ -283,7 +294,7 @@
             </DockPanel>
 
             <!-- % ***** Минимальное количество шагов по объекту ***** % -->
-            <DockPanel Canvas.Top="440"
+            <DockPanel Canvas.Top="460"
                        Canvas.Left="5">
                 <TextBlock Margin="5,2,0,2"
                            FontSize="16"
@@ -297,7 +308,7 @@
             </DockPanel>
 
             <!-- % ***** Коэффициент разрядки от объекта (ОX) ***** % -->
-            <DockPanel Canvas.Top="465"
+            <DockPanel Canvas.Top="485"
                        Canvas.Left="5">
                 <TextBlock Margin="5,2,0,2"
                            FontSize="16"
@@ -311,7 +322,7 @@
             </DockPanel>
 
             <!-- % ***** Коэффициент разрядки от объекта (ОY) ***** % -->
-            <DockPanel Canvas.Top="490"
+            <DockPanel Canvas.Top="510"
                        Canvas.Left="5">
                 <TextBlock Margin="5,2,0,2"
                            FontSize="16"
@@ -325,7 +336,7 @@
             </DockPanel>
 
             <!--Separator-->
-            <StackPanel Orientation="Horizontal" Canvas.Top="510">
+            <StackPanel Orientation="Horizontal" Canvas.Top="525">
                 <Separator Height="15" Width="350"/>
             </StackPanel>
             
@@ -334,22 +345,35 @@
                        TextWrapping="Wrap" 
                        Text="Добавление слоев:"
                        FontSize="16"
-                       Canvas.Top="520"/>
+                       Canvas.Top="535"/>
 
             <!-- % ***** Добавление и удаление слоев ***** % -->
-            <DockPanel Canvas.Top="540"
+            <DockPanel Canvas.Top="555"
                        Canvas.Left="15">
-                <ListBox x:Name="layersList"  Width="100"  Height="100"/>
+                <ListBox x:Name="layersList" 
+                         Width="130"  Height="100"
+                         SelectionChanged="layersList_SelectionChanged"/>
                 <StackPanel>
                     <DockPanel>
                         <TextBlock Margin="2"
                            FontSize="16"
-                           Text="Значение: "/>
+                           Text="Значение Y: "/>
                         <TextBox x:Name="TextLayer"
                              Padding="2"
                              TextWrapping="NoWrap"
                              TextAlignment="Center"
-                             Width="100"
+                             Width="99"
+                             PreviewTextInput="PreviewTextInputDouble"/>
+                    </DockPanel>
+                    <DockPanel>
+                        <TextBlock Margin="2"
+                           FontSize="16"
+                           Text="Значение &#963;: "/>
+                        <TextBox x:Name="TextLayerSigma"
+                             Padding="2"
+                             TextWrapping="NoWrap"
+                             TextAlignment="Center"
+                             Width="99"
                              PreviewTextInput="PreviewTextInputDouble"/>
                     </DockPanel>
                     <Button Content="Добавить слой"
@@ -364,19 +388,19 @@
             </DockPanel>
 
             <!--Separator-->
-            <StackPanel Orientation="Horizontal" Canvas.Top="635">
+            <StackPanel Orientation="Horizontal" Canvas.Top="650">
                 <Separator Height="15" Width="350"/>
             </StackPanel>
 
             <!-- % ***** Краевые на границах ***** % -->
-            <TextBlock Canvas.Top="645"
+            <TextBlock Canvas.Top="660"
                        Canvas.Left="60"
                        Margin="5,2,0,2"
                        FontSize="15"
                        Text="Краевые условия на границах:"/>
 
             <!-- % ***** Нижняя и правая сторона ***** % -->
-            <DockPanel Canvas.Top="668"
+            <DockPanel Canvas.Top="682"
                         Canvas.Left="15">
                 <DockPanel>
                     <Image Source="img\side0.png"
@@ -403,7 +427,7 @@
             </DockPanel>
 
             <!-- % ***** Верхняя и левая сторона ***** % -->
-            <DockPanel Canvas.Top="700"
+            <DockPanel Canvas.Top="710"
                         Canvas.Left="15">
                 <DockPanel>
                     <Image Source="img\side2.png"
@@ -430,12 +454,12 @@
             </DockPanel>
 
             <!--Separator-->
-            <StackPanel Orientation="Horizontal" Canvas.Top="720">
+            <StackPanel Orientation="Horizontal" Canvas.Top="735">
                 <Separator Height="15" Width="350"/>
             </StackPanel>
 
             <!-- % ***** Кнопка построить сетку и запустить решатель ***** % -->
-            <DockPanel Canvas.Top="735"
+            <DockPanel Canvas.Top="750"
                        Canvas.Left="25">
                 <Button Content="Построить сетку"
                         Click="BuildGrid_Click"
