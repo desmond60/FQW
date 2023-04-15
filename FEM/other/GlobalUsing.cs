@@ -17,7 +17,7 @@ global using System.Drawing;
 global using static System.Math;
 
 // NuGet
-
+global using WatchTable;
 
 // Project
 global using Numerics;

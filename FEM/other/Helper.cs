@@ -67,8 +67,8 @@ public static class Helper
 
         if (index == layers.Count - 1) {
             for (int i = 0; i < items.Count; i++)
-                if ((items[i].End[1] <= layers[index].Y && items[i].Begin[1] <= layers[index].Y) ||
-                    (layers[index].Y >= items[i].Begin[1] && layers[index].Y <= items[i].End[1]))
+                if (items[i].End[1] < layers[index].Y ||
+                    (layers[index].Y > items[i].Begin[1] && layers[index].Y < items[i].End[1]))
                     id_item.Add((i, items[i]));
 
             id_item = id_item.OrderBy(n => n.Item2.Begin[0]).ToList();
@@ -79,8 +79,8 @@ public static class Helper
         }
 
         for (int i = 0; i < items.Count; i++)
-            if ((items[i].End[1] <= layers[index].Y && items[i].End[1] >= layers[index + 1].Y) ||
-                (items[i].Begin[1] <= layers[index].Y && items[i].Begin[1] >= layers[index + 1].Y) ||
+            if ((items[i].End[1] < layers[index].Y && items[i].End[1] > layers[index + 1].Y) ||
+                (items[i].Begin[1] < layers[index].Y && items[i].Begin[1] > layers[index + 1].Y) ||
                 (layers[index].Y >= items[i].Begin[1] && layers[index].Y <= items[i].End[1]))
                 id_item.Add((i, items[i]));
 
@@ -89,5 +89,26 @@ public static class Helper
         id = id_item.Select(n => n.Item1).ToList();
 
         return id.ToArray();
+    }
+
+    //: Скалярное произведение векторов
+    public static Complex Scalar(ComplexVector frst, ComplexVector scnd) {
+        Complex res = 0;
+        for (int i = 0; i < frst.Length; i++)
+            res += frst[i] * scnd[i];
+        return res;
+    }
+
+    //: Модуль комплексного вектора
+    public static double Norm(ComplexVector vec) {
+        double norm = 0;
+        for (int i = 0; i < vec.Length; i++)
+            norm += vec[i].Real * vec[i].Real + vec[i].Imaginary * vec[i].Imaginary;
+        return Sqrt(norm);
+    }
+
+    //: Модуль комплексного числа
+    public static double Norm(Complex ch) {
+        return Sqrt(ch.Real * ch.Real + ch.Imaginary * ch.Imaginary);
     }
 }

@@ -20,13 +20,13 @@
         <!--#endregion-->
 
         <Canvas x:Name="SolverBar"
-                Grid.Column="0"
+                Grid.Row ="0"
                 Background="#FFC4C4C8">
 
             <!-- % ***** Надпись nu ***** % -->
             <DockPanel Canvas.Left="15"
                        Canvas.Top="15">
-                
+
                 <TextBlock Text="&#956;: "
                            Margin="5"
                            FontSize="18"/>
@@ -46,9 +46,9 @@
                            Text="(6.2831)"
                            Margin="5"
                            FontSize="18"/>
-                
+
             </DockPanel>
-            
+
             <!-- % ***** Надпись ***** % -->
             <TextBlock Canvas.Left="50"
                        Canvas.Top="50"
@@ -95,11 +95,30 @@
                 <ListBox x:Name="sigmaList"  Width="260"  Height="100"/>
             </DockPanel>
 
-            <StackPanel Canvas.Top="400">
+            <StackPanel Canvas.Left="15"
+                        Canvas.Top="200">
                 <Button Content="Составить СЛАУ"
-                    Click="CreateSLAU_Click"/>
+                        Margin="5"
+                        Click="CreateSLAU_Click"/>
+            
+                <Button Content="Решить СЛАУ"
+                        Margin="5"
+                        Click="SolveSLAU_Click"/>
+
+                <Button Content="Выдать значения в приемниках"
+                        Margin="5"
+                        Click="TableReceiver_Click"/>
             </StackPanel>
 
+        </Canvas>
+
+        <Canvas x:Name="CanvasReceiver"
+                Grid.Row ="1">
+
+            <TextBlock x:Name="TextBoxSolver"
+                       Margin="2"
+                       FontSize="14"
+                       FontFamily="Consolas"/>
         </Canvas>
 
     </Grid>

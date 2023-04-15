@@ -223,7 +223,7 @@ public partial class MainWindow : Window
 
         // Настройки графика
         GridPlot.Plot.XAxis.Label("Ox");
-        GridPlot.Plot.YAxis.Label("Oy");
+        GridPlot.Plot.YAxis.Label("Oz");
         GridPlot.Plot.Title("Конечноэлементная сетка");
 
         GridPlot.Refresh();

@@ -225,7 +225,7 @@ void FromRSFToCSR_Real_2_Sym(int nb, int* ig, int* jg, complex<double>* di, comp
 int _tmain(int argc, _TCHAR* argv[])
 {
 	// Путь к СЛАУ
-	string path = "test/";
+	string path = "slauBIN/";
 
 	logfile.open(path + "pardiso64.log");
 	if (!logfile) {
@@ -280,28 +280,23 @@ int _tmain(int argc, _TCHAR* argv[])
 	// ig
 	ig = new int[nb + 1];
 	Read_Bin_File_Of_Long((path + "ig").c_str(), ig, nb + 1, 1);
-	Write_Txt_File_Of_Long((path + "ig.txt").c_str(), ig, nb + 1);
 	ig_n_1 = ig[nb];
 
 	// jg
 	jg = new int[ig_n_1];
 	Read_Bin_File_Of_Long((path + "jg").c_str(), jg, ig_n_1, 1);
-	Write_Txt_File_Of_Long((path + "jg.txt").c_str(), jg, ig_n_1);
 
 	// di
 	di = new complex<double>[nb];
 	Read_Bin_File_Of_Complex((path + "di").c_str(), di, nb, 1);
-	Write_Txt_File_Of_Complex((path + "di.txt").c_str(), di, nb, 1);
 
 	// gg
 	gg = new complex<double>[ig_n_1];
 	Read_Bin_File_Of_Complex((path + "gg").c_str(), gg, ig_n_1, 1);
-	Write_Txt_File_Of_Complex((path + "gg.txt").c_str(), gg, ig_n_1, 1);
 
 	// pr
 	pr = new MKL_Complex16[nb];
 	Read_Bin_File_Of_Complex((path + "pr").c_str(), pr, nb, 1);
-	Write_Txt_File_Of_Complex((path + "pr.txt").c_str(), pr, nb, 1);
 
 	// Конвертирование в CSR
 	FromRSFToCSR_Real_1_Sym(nb, ig, &sz_ia, &sz_ja);
@@ -309,16 +304,6 @@ int _tmain(int argc, _TCHAR* argv[])
 	ja = new MKL_INT[sz_ja];
 	a = new MKL_Complex16[sz_ja];
 	FromRSFToCSR_Real_2_Sym(nb, ig, jg, di, gg, ia, ja, a);
-	Write_Txt_File_Of_Complex((path + "a.txt").c_str(), a, sz_ja, 1);
-	Write_Txt_File_Of_Long((path + "ia.txt").c_str(), ia, sz_ia);
-	Write_Txt_File_Of_Long((path + "ja.txt").c_str(), ja, sz_ja);
-
-	// Вот это он решает
-	//nb = 5;
-	//ia = new MKL_INT[nb + 1]{ 1, 4, 5, 8, 9, 10 };
-	//ja = new MKL_INT[ia[nb]]{ 1, 2, 4, 2, 3, 4, 5, 4, 5 };
-	//a = new MKL_Complex16[ia[nb]]{ {1, 0}, {-1, 0}, {-3, 0}, {5, 0}, {4, 0}, {6, 0}, {4, 0}, {7, 0}, {-5, 1} };
-	//pr = new MKL_Complex16[nb]{ {-13, 0}, {9, 0}, {56, 0}, {43, 0}, {-13, 5}};
 
 	for (int i = 0; i < sz_ia; i++)
 		ia[i]++;
@@ -335,6 +320,10 @@ int _tmain(int argc, _TCHAR* argv[])
 	n = nb;
 	x = new MKL_Complex16[nb];
 	perm = new MKL_INT[nb];
+	for (int i = 0; i < nb; i++) {
+		x[i] = MKL_Complex16{0, 0};
+		perm[i] = 0;
+	}
 
 	cout << "pardiso start.." << endl << flush;
 
@@ -348,7 +337,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	fout.close();
 
 	// Запись решения
-	Write_Txt_File_Of_Complex((path + "x.txt").c_str(), x, nb, 1);
+	Write_Txt_File_Of_Complex((path + "q.txt").c_str(), x, nb, 1);
+	Write_Txt_File_Of_Complex(string("slauTXT/q.txt").c_str(), x, nb, 1);
 
 	// Запись и вывод info
 	cout << "info=" << info << endl;
@@ -363,5 +353,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	logfile.close();
 	logfile.clear();
+
+	system("pause");
 	return 0;
 }

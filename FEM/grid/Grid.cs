@@ -128,12 +128,14 @@ public struct Grid
                             out List<Elem>    elems,
                             out List<Bound>   kraevs,
                             out List<Item>    items,
-                            out List<Layer>  layers) {
+                            out List<Layer>  layers,
+                            out List<(double, double)> sigmas) {
         edges  = Edges;
         nodes  = Nodes;
         elems  = Elems;
         kraevs = Bounds;
         items  = Items;
         layers = Layers;
+        sigmas = Sigmas;
     }
 }

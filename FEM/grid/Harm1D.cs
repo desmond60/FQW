@@ -20,24 +20,13 @@ public struct Harm1D
         var sreda_str = new StringBuilder($"{layers.Count}\n");
         for (int i = 1; i < layers.Count + 1; i++)
             sreda_str.Append($"{layers[^i].Y} {1e-2.ToString("E")} {1}\n");
-        sreda_str.Append(
-        """
-         -100000000.000000 3
-        -2250.00000000000 -250.000000000000 0.000000000000000E+000
-        42.4254101422018 5.00763234725907 0.243793777345399     
-        1.02000000000000 1.02000000000000 1.02000000000000
-        -1 -1 -1
-        0
-        1.00000000000000   
-        """
-        );
         File.WriteAllText(@"harm1D\sreda1d.ay", sreda_str.ToString());
 
         // Заполнение файла sig3d
         var sig3d_str = new StringBuilder();
         sig3d_str.Append($"{1} {0.ToString("E")} {0.ToString("E")}\n");
-        for (int i = 1; i < layers.Count + 1; i++)
-            sig3d_str.Append($"{i + 1} {0.ToString("E")} {layers[^i].Sigma.ToString("E")}\n");
+        for (int i = 0, id = 2; i < layers.Count; i++, id++)
+            sig3d_str.Append($"{id} {0.ToString("E")} {layers[i].Sigma.ToString("E")}\n");
         File.WriteAllText(@"harm1D\sig3d", sig3d_str.ToString());
 
         // Заполнение файла nu
@@ -46,7 +35,7 @@ public struct Harm1D
 
     //: Запустить решатель одномерной задачи
     public void RunHarm1D() {
-        string command = "cd harm1d & harm1d/Harm1D.exe & cd ..";
+        string command = "cd harm1d & Harm1D.exe & cd ..";
         Process process = Process.Start("cmd.exe", "/C " + command);
         process.WaitForExit();
     }

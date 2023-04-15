@@ -4,24 +4,22 @@
 public class FEM
 {
     //: Поля и свойства
-    private List<Node>    Nodes;   // Узлы
-    private List<Edge>    Edges;   // Ребра
-    private List<Elem>    Elems;   // КЭ
-    private List<Bound>   Bounds;  // Краевые
-    private List<Item>    Items;   // Объекты
-    private List<Layer>   Layers;  // Слои
-    private SLAU          slau;    // Структура СЛАУ
+    private List<Node>                             Nodes;   // Узлы
+    private List<Edge>                             Edges;   // Ребра
+    private List<Elem>                             Elems;   // КЭ
+    private List<Bound>                            Bounds;  // Краевые
+    private List<Item>                             Items;   // Объекты
+    private List<Layer>                            Layers;  // Слои
+    private List<(double Sigma1D, double Sigma2D)> Sigmas;  // Значения проводимости
+    private SLAU slau;    // Структура СЛАУ
 
-    public Vector<double> Receivers { get; set; }   // Значения приемников
-    public Vector<double> Sigma1D   { get; set; }   // Значение одномерной sigma
-    public Vector<double> Sigma2D   { get; set; }   // Значениие двумерной sigma
     public double         Nu        { get; set; }   // Частота тока
     public double         W => 2.0 * PI * Nu;       // Круговая частота
     public Harm1D         harm1D    { get; set; }   // Структура одномерной задачи
 
     //: Конструктор FEM
     public FEM(Grid grid, Harm1D harm1D) {
-        (Nodes, Edges, Elems, Bounds, Items, Layers) = grid;
+        (Nodes, Edges, Elems, Bounds, Items, Layers, Sigmas) = grid;
         this.harm1D = harm1D;
         this.slau = new SLAU();
     }
@@ -120,7 +118,7 @@ public class FEM
     private ComplexMatrix build_M(int index_fin_el, double hx, double hy) {
 
         // Подсчет коэффициента
-        double coef = (W * Sigma2D[Elems[index_fin_el].Material - 1] * hx * hy) / 6.0;
+        double coef = (W * Sigmas[Elems[index_fin_el].Material - 1].Sigma2D * hx * hy) / 6.0;
 
         // Матрица масс
         var M_matrix = new ComplexMatrix(new Complex[4, 4]{
@@ -149,12 +147,47 @@ public class FEM
         M_matrix = coef * M_matrix;
 
         // Вычисление вектора-потенциала
-        Complex Fcoef = -new Complex(0, 1) * W * (Sigma2D[Elems[index_fin_el].Material - 1] - Sigma1D[Elems[index_fin_el].Material - 1]);
+        Complex Fcoef = -new Complex(0, 1) * W * (Sigmas[Elems[index_fin_el].Material - 1].Sigma2D - Sigmas[Elems[index_fin_el].Material - 1].Sigma1D);
         var f = new ComplexVector(4);
-        /*        for (int i = 0; i < f.Length; i++)
-                    f[i] = Func(Edges[Elems[index_fin_el].Edge[i]], Elems[index_fin_el].Sigma);*/
+        ComplexVector.Fill(f, new Complex(0, 0));
+
+        if (Abs(Sigmas[Elems[index_fin_el].Material - 1].Sigma2D - Sigmas[Elems[index_fin_el].Material - 1].Sigma1D) <= 1e-10) return f;
+
+        // Боковые ребра = (0,0)
+
+        // Находим значение нижнего ребра
+        f[2] = F(Edges[Elems[index_fin_el].Edge[2]]);
+
+        // Находим значение верхнего ребра 
+        f[3] = F(Edges[Elems[index_fin_el].Edge[3]]);
+
+        // Умножение на коэффициент
+        f = Fcoef * f;
 
         return M_matrix * f;
+    }
+
+    private Complex F(Edge edge) {
+
+        // Строим узел
+        Node node = edge.NodeBegin.Y == edge.NodeEnd.Y ?
+             new Node((edge.NodeBegin.X + edge.NodeEnd.X) / 2.0, edge.NodeBegin.Y) :
+             new Node(edge.NodeBegin.X, (edge.NodeBegin.Y + edge.NodeEnd.Y) / 2.0);
+
+        // Находим узлы из одномернной задачи
+        int id1 = 0, id2 = 0;
+        for (int i = 0; i < harm1D.Nodes.Count - 1; i++) {
+            if ((node.Y >= harm1D.Nodes[i].Y && node.Y <= harm1D.Nodes[i + 1].Y) || (Abs(node.Y) <= 1e-10)) {
+                id1 = i;
+                id2 = i + 1;
+            }
+        }
+
+        // Находим коэффициенты прямой
+        Complex k = (harm1D.U[id2] - harm1D.U[id1]) / (harm1D.Nodes[id2].Y - harm1D.Nodes[id1].Y);
+        Complex b = harm1D.U[id2] - k * harm1D.Nodes[id2].Y;
+
+        return k * node.Y + b;
     }
 
     //: Занесение матрицы в глоабальную матрицу
@@ -187,7 +220,7 @@ public class FEM
     private void MainKraev(Bound bound) {
 
         // Номер ребра и значение краевого
-        (int row, Complex value) = (bound.Edge, 0);
+        (int row, Complex value) = (bound.Edge, new Complex(0, 0));
 
         // Учет краевого
         slau.di[row] = new Complex(1, 0);
@@ -212,23 +245,6 @@ public class FEM
 
     //: Учет естественного краевого условия
     private void NaturalKraev(Bound kraev) { }
-
-    //: Установка параметров для МКЭ
-    public bool TrySetParameter(string name, Vector<double> value) {
-        if (name == nameof(Receivers))  {
-            Receivers = (Vector<double>)value.Clone();
-            return true;
-        }
-        if (name == nameof(Sigma1D)) {
-            Sigma1D = (Vector<double>)value.Clone();
-            return true;
-        }
-        if (name == nameof(Sigma2D)) {
-            Sigma2D = (Vector<double>)value.Clone();
-            return true;
-        }
-        return false;
-    }
 
     //: Установка параметров для МКЭ
     public bool TrySetParameter(string name, double value) {

@@ -66,7 +66,7 @@
                     <DockPanel>
                         <TextBlock FontSize="16"
                                    Margin="50,2,-20,2"
-                                   Text="Y:"/>
+                                   Text="Z:"/>
                         <TextBox x:Name="Begin_BG_Y"
                                  Padding="2"
                                  Text="0"
@@ -98,7 +98,7 @@
                     <DockPanel>
                         <TextBlock FontSize="16"
                                    Margin="50,2,-20,2"
-                                   Text="Y:"/>
+                                   Text="Z:"/>
                         <TextBox x:Name="End_BG_Y"
                                  Padding="2"
                                  Text="0"
@@ -142,7 +142,7 @@
                     <DockPanel>
                         <TextBlock FontSize="16"
                                    Margin="50,2,-20,2"
-                                   Text="Y:"/>
+                                   Text="Z:"/>
                         <TextBox x:Name="Begin_SML_Y"
                                  Padding="2"
                                  Text="0"
@@ -174,7 +174,7 @@
                     <DockPanel>
                         <TextBlock FontSize="16"
                                    Margin="50,2,-20,2"
-                                   Text="Y:"/>
+                                   Text="Z:"/>
                         <TextBox x:Name="End_SML_Y"
                                  Padding="2"
                                  Text="0"
@@ -190,7 +190,7 @@
                        Canvas.Left="5">
                 <TextBlock Margin="5,2,0,2"
                            FontSize="16"
-                           Text="Количество разбиений по объекту (Ox)"/>
+                           Text="Количество разбиений по объекту (OX)"/>
                 <TextBox x:Name="N_X"
                          Padding="2"
                          Text="6"
@@ -204,7 +204,7 @@
                        Canvas.Left="5">
                 <TextBlock Margin="5,2,0,2"
                            FontSize="16"
-                           Text="Количество разбиений по объекту (Oy)"/>
+                           Text="Количество разбиений по объекту (OZ)"/>
                 <TextBox x:Name="N_Y"
                          Padding="2"
                          Text="6"
@@ -326,7 +326,7 @@
                        Canvas.Left="5">
                 <TextBlock Margin="5,2,0,2"
                            FontSize="16"
-                           Text="Коэффициент разрядки от объекта (ОY):"/>
+                           Text="Коэффициент разрядки от объекта (ОZ):"/>
                 <TextBox x:Name="K_Y"
                          Padding="2"
                          Text="1.2"
@@ -357,7 +357,7 @@
                     <DockPanel>
                         <TextBlock Margin="2"
                            FontSize="16"
-                           Text="Значение Y: "/>
+                           Text="Значение Z: "/>
                         <TextBox x:Name="TextLayer"
                              Padding="2"
                              TextWrapping="NoWrap"
