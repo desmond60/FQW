@@ -77,8 +77,8 @@ public partial class Solver
             var nu = double.Parse(NuBox.Text);
 
             var value = (-1) * new Complex(0, 1) * (2.0 * PI * nu) * (k * receivers[i] + b + harm1d.U[^1]);
-            value /= harm1d.U[^1];
-            //value = new Complex(value.Real / harm1d.U[^1].Real, value.Imaginary / harm1d.U[^1].Imaginary);
+            var norm = (-1) * new Complex(0, 1) * (2.0 * PI * nu) * harm1d.U[^1];
+            value = value / norm;
 
             table_rec.AddRow($"{receivers[i]}", $"{value.Real.ToString("E5")} {value.Imaginary.ToString("E5")}");
         }
