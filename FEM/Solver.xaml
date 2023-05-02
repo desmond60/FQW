@@ -5,8 +5,8 @@
         WindowStartupLocation="CenterScreen"
         
         Title="Solver"
-        Height="656" Width="650"
-        MinHeight="656" MinWidth="650"
+        Height="656" Width="830"
+        MinHeight="656" MinWidth="830"
     
         FontFamily="Times New Roman" 
         FontWeight="Bold" FontSize="14">
@@ -110,15 +110,26 @@
                         Click="TableReceiver_Click"/>
             </StackPanel>
 
+            <StackPanel Canvas.Left="680"
+                        Canvas.Top="100">
+                <Button Content="График Rk"
+                        Margin="5"
+                        Click="DrawRkPlot_Click"/>
+
+                <Button Content="График Ex"
+                        Margin="5"
+                        Click="DrawExPlot_Click"/>
+            </StackPanel>
+
         </Canvas>
 
         <Canvas x:Name="CanvasReceiver"
                 Grid.Row ="1">
 
-            <TextBlock x:Name="TextBoxSolver"
-                       Margin="2"
-                       FontSize="14"
-                       FontFamily="Consolas"/>
+            <TextBox x:Name="TextBoxSolver"
+                     Margin="2"
+                     FontSize="14"
+                     FontFamily="Consolas"/>
         </Canvas>
 
     </Grid>

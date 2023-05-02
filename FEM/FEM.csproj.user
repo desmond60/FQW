@@ -7,12 +7,24 @@
     </ApplicationDefinition>
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="Ex.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Rk.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Solver.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Page Update="Ex.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="MainWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Rk.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Solver.xaml">

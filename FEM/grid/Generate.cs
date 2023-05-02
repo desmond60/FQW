@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace FEM;
+﻿namespace FEM;
 
 //: Построение сетки
 public partial class MainWindow : Window

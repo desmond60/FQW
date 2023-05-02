@@ -1,6 +1,4 @@
-﻿using FEM.grid;
-
-namespace FEM;
+﻿namespace FEM;
 
 //: Обработчики Button
 public partial class Solver
@@ -47,6 +45,8 @@ public partial class Solver
     private void TableReceiver_Click(object sender, RoutedEventArgs e) {
 
         var receivers = new Vector<double>(receivers_str.Select(n => double.Parse(n)).OrderByDescending(n => n).ToArray());
+        lEx.Clear();
+        lRk.Clear();
 
         List<(int id, Node node)> surface = new List<(int, Node)>();
         for (int i = 0; i < grid.Edges.Count; i++) {
@@ -57,7 +57,7 @@ public partial class Solver
         }
 
         Table table_rec = new Table("Таблица с приемниками");
-        table_rec.AddColumn(("Приемник", 15), ("Значение", 40));
+        table_rec.AddColumn(("Приемник", 15), ("Re Ex", 15), ("Im Ex", 15), ("Hy", 35), ("Rk", 15));
 
         for (int i = 0; i < receivers.Length; i++) {
 
@@ -75,12 +75,28 @@ public partial class Solver
             Complex b = slau.q[surface[id2].id] - k * surface[id2].node.X;
 
             var nu = double.Parse(NuBox.Text);
+            var w = 2.0 * PI * nu;
 
-            var value = (-1) * new Complex(0, 1) * (2.0 * PI * nu) * (k * receivers[i] + b + harm1d.U[^1]);
-            var norm = (-1) * new Complex(0, 1) * (2.0 * PI * nu) * harm1d.U[^1];
-            value = value / norm;
+            // Компонента электрического поля
+            var E = (-1) * new Complex(0, 1) * w * (k * receivers[i] + b + harm1d.U[^1]);
+            var norm = (-1) * new Complex(0, 1) * w * harm1d.U[^1];
+            E = E / norm;
 
-            table_rec.AddRow($"{receivers[i]}", $"{value.Real.ToString("E5")} {value.Imaginary.ToString("E5")}");
+            // Компонента магнитного поля
+            var H = new Complex(1, 1); //: Здесь производная должна быть
+
+            // Компонента Z в случае H-поляризации
+            var Z = E / H;
+
+            // Кажущиеся сопротивления
+            var R = Pow(Norm(Z), 2) / (w * nu);
+
+            // Добавление в листы
+            lEx.Add(E);
+            lRk.Add(R);
+
+            table_rec.AddRow($"{receivers[i]}", $"{E.Real.ToString("E5")}", $"{E.Imaginary.ToString("E5")}",
+                             $"({H.Real.ToString("E5")}, {H.Imaginary.ToString("E5")})", $"{R.ToString("E5")}");
         }
 
         TextBoxSolver.Text = table_rec.ToString();
@@ -109,5 +125,17 @@ public partial class Solver
         }
         receivers_str.Remove((string)receiversList.SelectedValue);
         receiversList.Items.Refresh();
+    }
+
+    //: Обработка кнопки "Построить график Rk"
+    private void DrawRkPlot_Click(object sender, RoutedEventArgs e) {
+        Rk rk = new Rk(lRk, receivers_str.Select(n => double.Parse(n)).OrderByDescending(n => n).ToList());
+        rk.Show();
+    }
+
+    //: Обработка кнопки "Построить график Ex"
+    private void DrawExPlot_Click(object sender, RoutedEventArgs e) {
+        Ex ex = new Ex(lEx, receivers_str.Select(n => double.Parse(n)).OrderByDescending(n => n).ToList());
+        ex.Show();
     }
 }

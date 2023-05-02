@@ -4,6 +4,7 @@
 public partial class Solver : Window
 {
     public Solver() {
+        CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("en-US");   // Установка культуры
         InitializeComponent();
         grid.LoadGrid();
         LoadSigmaMaterial();
@@ -18,6 +19,8 @@ public partial class Solver : Window
 
     List<string> receivers_str = new List<string>();   // Лист с приемниками для ListBox
     List<string> sigma_str = new List<string>();       // Лист с проводимостью для ListBox
+    List<Complex> lEx = new List<Complex>();           // Лист с компонентами электрического поля
+    List<double>  lRk = new List<double>();            // Лист с кажущимеся сопротивлениями
 
     /* ----------------------- Переменные --------------------------------- */
 

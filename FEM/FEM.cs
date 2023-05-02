@@ -177,7 +177,7 @@ public class FEM
         // Находим узлы из одномернной задачи
         int id1 = 0, id2 = 0;
         for (int i = 0; i < harm1D.Nodes.Count - 1; i++) {
-            if ((node.Y >= harm1D.Nodes[i].Y && node.Y <= harm1D.Nodes[i + 1].Y) || (Abs(node.Y) <= 1e-10)) {
+            if (node.Y >= harm1D.Nodes[i].Y && node.Y <= harm1D.Nodes[i + 1].Y) {
                 id1 = i;
                 id2 = i + 1;
             }
