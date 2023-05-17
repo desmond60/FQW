@@ -59,33 +59,6 @@ public partial class Solver
             }
         }
 
-        // ************************************* Для полинома ***************************** //
-
-/*        StringBuilder table = new StringBuilder(String.Format("{0,-8} | {1,-30} | {2,-30} | {3,0} \n", "Приемник", "A*", "A", "|A* - A|"));
-
-        var ABS = new ComplexVector(surface.Count);
-        var SUB = new ComplexVector(surface.Count);
-        for (int i = 0; i < surface.Count; i++)
-        {
-
-            Complex q = slau.q[surface[i].id];
-
-            Complex A = Absolut(grid.Edges[surface[i].id]);
-            Complex SubA = A - q;
-            ABS[i] = A;
-            SUB[i] = SubA;
-            SubA = new Complex(Abs(SubA.Real), Abs(SubA.Imaginary));
-
-            string str = String.Format("{0,-8} | {1,-30} | {2,-30} | {3,0} \n",
-                                        $"{surface[i].node.X.ToString("F1")}", $"({q.Real.ToString("E3")}, {q.Imaginary.ToString("E3")})",
-                                        $"({A.Real.ToString("E3")}, {A.Imaginary.ToString("E3")})", $"({SubA.Real.ToString("E3")}, {SubA.Imaginary.ToString("E3")})");
-            table.Append(str.Replace(".", ","));
-        }
-        table.Append((Helper.Norm(SUB) / Helper.Norm(ABS)).ToString().Replace(".", ","));
-        TextBoxSolver.Document.Blocks.Add(new Paragraph(new Run(table.ToString())));*/
-
-        // ********************************************************************************************** //
-
         // ************************************* Для основной задачи ***************************** //
 
         StringBuilder table = new StringBuilder(String.Format("{0,-5} | {1,-15} | {2,-15} | {3,-30} | {4,0} \n", "Приемник", "Re Ex", "Im Ex", "Hy", "Rk"));

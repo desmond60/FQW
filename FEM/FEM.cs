@@ -93,9 +93,6 @@ public class FEM
         double coef_x_on_y = hx / hy;
         double coef_nu = 1.0 / Nu;
 
-        // ******* Для полинома ****** //
-        //double coef_nu = 1.0;
-
         // Матрица жесткости
         var G_matrix = new Matrix<double>(new double[4, 4]{
             { 1, -1, -1,  1},
@@ -123,9 +120,6 @@ public class FEM
         // Подсчет коэффициента для основной задачи
         double coef = (W * Sigmas[Elems[index_fin_el].Material - 1].Sigma2D * hx * hy) / 6.0;
 
-        // Подсчет коэффициента для полинома
-        //double coef = (2 * PI * 0.1 * hx * hy) / 6.0;
-
         // Матрица масс
         var M_matrix = new ComplexMatrix(new Complex[4, 4]{
             {2, 1, 0, 0},
@@ -151,15 +145,6 @@ public class FEM
             {0, 0, 1, 2}
         });
         M_matrix = coef * M_matrix;
-
-        // ************  Для задачи с полиномом ********** //
-
-        /*        var f = new ComplexVector(4);
-                for (int i = 0; i < f.Length; i++)
-                    f[i] = Func(Edges[Elems[index_fin_el].Edge[i]], new Complex(0, 1) * 2 * PI * 0.1, 1.0);*/
-
-        // *********************************************  //
-
 
         // ************  Для задачи основной ********** //
 
@@ -240,9 +225,6 @@ public class FEM
 
         // Номер ребра и значение краевого основной задачи
         (int row, Complex value) = (bound.Edge, new Complex(0, 0));
-
-        // Номер ребра и значение краевого для полинома
-        //(int row, Complex value) = (bound.Edge, Absolut(Edges[bound.Edge]));
 
         // Учет краевого
         slau.di[row] = new Complex(1, 0);
