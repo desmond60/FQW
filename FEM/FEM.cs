@@ -14,7 +14,7 @@ public class FEM
     private SLAU slau;    // Структура СЛАУ
 
     public double         Nu        { get; set; }   // Частота тока
-    public double         W => 2.0 * PI * Nu;       // Круговая частота
+    public double         W => 2.0 * PI * Nu / Nu0; // Круговая частота
     public Harm1D         harm1D    { get; set; }   // Структура одномерной задачи
 
     //: Конструктор FEM
@@ -88,10 +88,13 @@ public class FEM
     //: Построение матрицы жесткости (G)
     private Matrix<double> build_G(int index_fin_el, double hx, double hy) {
 
-        // Подсчет коэффициентов
+        // Подсчет коэффициентов для основной задачи
         double coef_y_on_x = hy / hx;
         double coef_x_on_y = hx / hy;
         double coef_nu = 1.0 / Nu;
+
+        // ******* Для полинома ****** //
+        //double coef_nu = 1.0;
 
         // Матрица жесткости
         var G_matrix = new Matrix<double>(new double[4, 4]{
@@ -117,8 +120,11 @@ public class FEM
     //: Построение матрицы масс (M)
     private ComplexMatrix build_M(int index_fin_el, double hx, double hy) {
 
-        // Подсчет коэффициента
+        // Подсчет коэффициента для основной задачи
         double coef = (W * Sigmas[Elems[index_fin_el].Material - 1].Sigma2D * hx * hy) / 6.0;
+
+        // Подсчет коэффициента для полинома
+        //double coef = (2 * PI * 0.1 * hx * hy) / 6.0;
 
         // Матрица масс
         var M_matrix = new ComplexMatrix(new Complex[4, 4]{
@@ -146,6 +152,17 @@ public class FEM
         });
         M_matrix = coef * M_matrix;
 
+        // ************  Для задачи с полиномом ********** //
+
+        /*        var f = new ComplexVector(4);
+                for (int i = 0; i < f.Length; i++)
+                    f[i] = Func(Edges[Elems[index_fin_el].Edge[i]], new Complex(0, 1) * 2 * PI * 0.1, 1.0);*/
+
+        // *********************************************  //
+
+
+        // ************  Для задачи основной ********** //
+
         // Вычисление вектора-потенциала
         Complex Fcoef = -new Complex(0, 1) * W * (Sigmas[Elems[index_fin_el].Material - 1].Sigma2D - Sigmas[Elems[index_fin_el].Material - 1].Sigma1D);
         var f = new ComplexVector(4);
@@ -163,6 +180,8 @@ public class FEM
 
         // Умножение на коэффициент
         f = Fcoef * f;
+
+        // *********************************************  //
 
         return M_matrix * f;
     }
@@ -219,8 +238,11 @@ public class FEM
     //: Учет главного краевого условия
     private void MainKraev(Bound bound) {
 
-        // Номер ребра и значение краевого
+        // Номер ребра и значение краевого основной задачи
         (int row, Complex value) = (bound.Edge, new Complex(0, 0));
+
+        // Номер ребра и значение краевого для полинома
+        //(int row, Complex value) = (bound.Edge, Absolut(Edges[bound.Edge]));
 
         // Учет краевого
         slau.di[row] = new Complex(1, 0);

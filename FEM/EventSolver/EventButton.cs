@@ -17,7 +17,7 @@ public partial class Solver
 
         // Составление СЛАУ
         FEM fem = new FEM(grid, harm1d);
-        fem.TrySetParameter("Nu", nu);
+        fem.TrySetParameter("Nu", nu * Nu0);
         slau = fem.CreateSLAU();
 
         // Запись СЛАУ
@@ -45,6 +45,9 @@ public partial class Solver
     private void TableReceiver_Click(object sender, RoutedEventArgs e) {
 
         var receivers = new Vector<double>(receivers_str.Select(n => double.Parse(n)).OrderByDescending(n => n).ToArray());
+        var nu = double.Parse(NuBox.Text);
+        var w = 2.0 * PI * nu;
+        TextBoxSolver.Document.Blocks.Clear();
         lEx.Clear();
         lRk.Clear();
 
@@ -56,15 +59,46 @@ public partial class Solver
             }
         }
 
-        Table table_rec = new Table("Таблица с приемниками");
-        table_rec.AddColumn(("Приемник", 15), ("Re Ex", 15), ("Im Ex", 15), ("Hy", 35), ("Rk", 15));
+        // ************************************* Для полинома ***************************** //
 
-        for (int i = 0; i < receivers.Length; i++) {
+/*        StringBuilder table = new StringBuilder(String.Format("{0,-8} | {1,-30} | {2,-30} | {3,0} \n", "Приемник", "A*", "A", "|A* - A|"));
 
-            // Находим узлы из одномернной задачи
+        var ABS = new ComplexVector(surface.Count);
+        var SUB = new ComplexVector(surface.Count);
+        for (int i = 0; i < surface.Count; i++)
+        {
+
+            Complex q = slau.q[surface[i].id];
+
+            Complex A = Absolut(grid.Edges[surface[i].id]);
+            Complex SubA = A - q;
+            ABS[i] = A;
+            SUB[i] = SubA;
+            SubA = new Complex(Abs(SubA.Real), Abs(SubA.Imaginary));
+
+            string str = String.Format("{0,-8} | {1,-30} | {2,-30} | {3,0} \n",
+                                        $"{surface[i].node.X.ToString("F1")}", $"({q.Real.ToString("E3")}, {q.Imaginary.ToString("E3")})",
+                                        $"({A.Real.ToString("E3")}, {A.Imaginary.ToString("E3")})", $"({SubA.Real.ToString("E3")}, {SubA.Imaginary.ToString("E3")})");
+            table.Append(str.Replace(".", ","));
+        }
+        table.Append((Helper.Norm(SUB) / Helper.Norm(ABS)).ToString().Replace(".", ","));
+        TextBoxSolver.Document.Blocks.Add(new Paragraph(new Run(table.ToString())));*/
+
+        // ********************************************************************************************** //
+
+        // ************************************* Для основной задачи ***************************** //
+
+        StringBuilder table = new StringBuilder(String.Format("{0,-5} | {1,-15} | {2,-15} | {3,-30} | {4,0} \n", "Приемник", "Re Ex", "Im Ex", "Hy", "Rk"));
+
+        for (int i = 0; i < receivers.Length; i++)
+        {
+
+            // Находим узлы
             int id1 = 0, id2 = 0;
-            for (int j = 0; j < surface.Count - 1; j++) {
-                if (receivers[i] >= surface[j].Item2.X && receivers[i] <= surface[j + 1].Item2.X) {
+            for (int j = 0; j < surface.Count - 1; j++)
+            {
+                if (receivers[i] >= surface[j].Item2.X && receivers[i] <= surface[j + 1].Item2.X)
+                {
                     id1 = j;
                     id2 = j + 1;
                 }
@@ -74,34 +108,63 @@ public partial class Solver
             Complex k = (slau.q[surface[id2].id] - slau.q[surface[id1].id]) / (surface[id2].node.X - surface[id1].node.X);
             Complex b = slau.q[surface[id2].id] - k * surface[id2].node.X;
 
-            var nu = double.Parse(NuBox.Text);
-            var w = 2.0 * PI * nu;
-
             // Компонента электрического поля
-            var E = (-1) * new Complex(0, 1) * w * (k * receivers[i] + b + harm1d.U[^1]);
-            var norm = (-1) * new Complex(0, 1) * w * harm1d.U[^1];
-            E = E / norm;
+            var A = k * receivers[i] + b + harm1d.U[^1];
+            var E = (-1) * new Complex(0, 1) * w * A;
+            var E1D = (-1) * new Complex(0, 1) * w * harm1d.U[^1];
+            var E_norm = E / E1D;
+
+            // Находим в какой элемент попадает приемник
+            var node = new Node(receivers[i], 0);
+            int id_elem = 0;
+            for (int j = 0; j < grid.Elems.Count; j++)
+            {
+                if ((node.X >= grid.Nodes[grid.Elems[j].Node[0]].X && node.X < grid.Nodes[grid.Elems[j].Node[3]].X) &&
+                    (node.Y > grid.Nodes[grid.Elems[j].Node[0]].Y && node.Y <= grid.Nodes[grid.Elems[j].Node[3]].Y))
+                    id_elem = j;
+            }
+            var elem = grid.Elems[id_elem];
+
+            // Компоненты hx и hy
+            double hx = grid.Nodes[elem.Node[3]].X - grid.Nodes[elem.Node[0]].X;
+            double hy = grid.Nodes[elem.Node[3]].Y - grid.Nodes[elem.Node[0]].Y;
+
+            // Производная базисных функций
+            var phi1 = -1 / hx;
+            var phi2 = 1 / hx;
+            var phi3 = 1 / hy;
+            var phi4 = -1 / hy;
+
+            // Сумма
+            var Sum = phi1 * slau.q[elem.Edge[0]] + phi2 * slau.q[elem.Edge[1]] + phi3 * slau.q[elem.Edge[2]] + phi4 * slau.q[elem.Edge[3]];
 
             // Компонента магнитного поля
-            var H = new Complex(1, 1); //: Здесь производная должна быть
+            var H1D = (harm1d.U[^1] - harm1d.U[^2]) / (harm1d.Nodes[^1].Y - harm1d.Nodes[^2].Y);
+            var H = (Sum + H1D) / Nu0;
+            var H_norm = H / H1D;
 
-            // Компонента Z в случае H-поляризации
+            // Компонента Z в случае H-поляризации ()
             var Z = E / H;
 
             // Кажущиеся сопротивления
-            var R = Pow(Norm(Z), 2) / (w * nu);
+            var R = Pow(Norm(Z), 2) / (w * Nu0);
 
             // Добавление в листы
-            lEx.Add(E);
+            lEx.Add(E_norm);
             lRk.Add(R);
 
-            table_rec.AddRow($"{receivers[i]}", $"{E.Real.ToString("E5")}", $"{E.Imaginary.ToString("E5")}",
-                             $"({H.Real.ToString("E5")}, {H.Imaginary.ToString("E5")})", $"{R.ToString("E5")}");
+            string str = String.Format("{0,-8} | {1,-15} | {2,-15} | {3,-30} | {4,0} \n",
+                        $"{receivers[i]}", $"{E_norm.Real.ToString("E5")}", $"{E_norm.Imaginary.ToString("E5")}",
+                        $"({H_norm.Real.ToString("E5")}, {H_norm.Imaginary.ToString("E5")})", $"{R.ToString("E5")}");
+            table.Append(str.Replace(".", ","));
         }
 
-        TextBoxSolver.Text = table_rec.ToString();
-        table_rec.WriteToFile(@"slau\solve.txt");
+        TextBoxSolver.Document.Blocks.Add(new Paragraph(new Run(table.ToString())));
+        File.WriteAllText(@"slau/result.txt", table.ToString());
+
+        // ********************************************************************************************** //
     }
+
 
     //: Обработка кнопки "Добавить приемник"
     private void AddReceiver_Click(object sender, RoutedEventArgs e) {
