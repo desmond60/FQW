@@ -28,7 +28,6 @@ global using FEM.other;
 
 // Project-static
 global using static FEM.other.Helper;
-global using static FEM.Polynoms;
 
 // Alias
 global using Grid = FEM.grid.Grid;
