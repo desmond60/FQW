@@ -14,7 +14,7 @@ public class FEM
     private SLAU slau;    // Структура СЛАУ
 
     public double         Nu        { get; set; }   // Частота тока
-    public double         W => 2.0 * PI * Nu / Nu0; // Круговая частота
+    public double         W => 2.0 * PI * Nu;       // Круговая частота
     public Harm1D         harm1D    { get; set; }   // Структура одномерной задачи
 
     //: Конструктор FEM
@@ -51,7 +51,7 @@ public class FEM
         
         // Обходим конечные элементы
         for (int index_fin_el = 0; index_fin_el < Elems.Count; index_fin_el++) {
-
+            
             // Составляем локальную матрицу и локальный вектор
             (ComplexMatrix loc_mat, ComplexVector local_f) = local(index_fin_el);
 
@@ -91,7 +91,7 @@ public class FEM
         // Подсчет коэффициентов для основной задачи
         double coef_y_on_x = hy / hx;
         double coef_x_on_y = hx / hy;
-        double coef_nu = 1.0 / Nu;
+        double coef_nu = 1.0 / Nu0;
 
         // Матрица жесткости
         var G_matrix = new Matrix<double>(new double[4, 4]{
@@ -187,6 +187,9 @@ public class FEM
             }
         }
 
+        if (id1 == id2)
+            return harm1D.U[^1];
+
         // Находим коэффициенты прямой
         Complex k = (harm1D.U[id2] - harm1D.U[id1]) / (harm1D.Nodes[id2].Y - harm1D.Nodes[id1].Y);
         Complex b = harm1D.U[id2] - k * harm1D.Nodes[id2].Y;
@@ -198,26 +201,29 @@ public class FEM
     private void EntryMatInGlobalMatrix(ComplexMatrix mat, int[] index) {
         for (int i = 0, h = 0; i < mat.Rows; i++) {
             int ibeg = index[i];
-            for (int j = i + 1; j < mat.Columns; j++) {
-                int iend = index[j];
-                int temp = ibeg;
+            //if (!Bounds.Exists(n => n.Edge == ibeg)) {
+                for (int j = i + 1; j < mat.Columns; j++)
+                {
+                    int iend = index[j];
+                    int temp = ibeg;
 
-                if (temp < iend)
-                    (iend, temp) = (temp, iend);
+                    if (temp < iend)
+                        (iend, temp) = (temp, iend);
 
-                h = slau.ig[temp];
-                while (slau.jg[h++] - iend != 0) ;
-                --h;
-                slau.gg[h] += mat[i, j];
-            }
-            slau.di[ibeg] += mat[i, i];
+                    h = slau.ig[temp];
+                    while (slau.jg[h++] - iend != 0) ;
+                    --h;
+                    slau.gg[h] += mat[i, j];
+                }
+                slau.di[ibeg] += mat[i, i];
+            //}
         }
     }
 
     //: Занесение вектора в глолбальный вектор
     private void EntryVecInGlobalMatrix(ComplexVector vec, int[] index) {
-        for (int i = 0; i < vec.Length; i++)
-            slau.pr[index[i]] += vec[i];
+            for (int i = 0; i < vec.Length; i++)
+                slau.pr[index[i]] += vec[i];
     }
 
     //: Учет главного краевого условия

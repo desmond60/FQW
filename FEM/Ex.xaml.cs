@@ -6,10 +6,35 @@ public partial class Ex : Window
     public Ex(List<Complex> lEx, List<double> receivers) {
         InitializeComponent();
 
-        ExPlot.Plot.AddScatter(receivers.ToArray(), lEx.Select(n => n.Real).ToArray());
+        // График модель 2Д-1 при частоте 0.1 Гц
+/*        var abs = new double[] {
+            0.127,
+            0.688,
+            1.064,
+            1.078,
+            1.038,
+            1.015,
+            1.008
+        };*/
 
-        // Настройки графика
-        ExPlot.Plot.Title("График Ex");
+        // График модель 2Д-1 при частоте 10 Гц
+/*        var abs = new double[] {
+                    0.289,
+                    0.703,
+                    0.962,
+                    0.989,
+                    0.995,
+                    0.996,
+                    0.996
+                };*/
+
+        var scatter = ExPlot.Plot.AddScatter(receivers.ToArray(), lEx.Select(n => n.Real).ToArray(), Color.Green);
+        scatter.LineWidth = 1;
+        scatter.MarkerColor = Color.DarkRed;
+
+/*        scatter = ExPlot.Plot.AddScatter(receivers.ToArray(), abs, Color.Red);
+        scatter.LineWidth = 1;
+        scatter.MarkerColor = Color.DarkGreen;*/
 
         ExPlot.Refresh();
     }

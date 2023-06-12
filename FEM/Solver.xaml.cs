@@ -10,6 +10,13 @@ public partial class Solver : Window
         LoadSigmaMaterial();
         receiversList.ItemsSource = receivers_str;   // ListBox для приемников
         sigmaList.ItemsSource = sigma_str;           // ListBox для проводимости
+
+        // Чтение приемников
+        string[] FReceiver = File.ReadAllLines(@"grid/receivers.txt");
+        for (int i = 0; i < FReceiver.Length; i++) {
+            receivers_str.Add(FReceiver[i]);
+        }
+        receiversList.Items.Refresh();
     }
 
     /* ----------------------- Переменные --------------------------------- */

@@ -39,14 +39,26 @@ public struct SLAU
         // Запись ig
         File.WriteAllText(PathTXT + "/ig.txt", String.Join("\n", ig.ToArray()), Encoding.UTF8);
 
+        // Запись ig для портрета
+        File.WriteAllText(PathTXT + "/ig_port.txt", String.Join(" ", ig.ToArray()));
+
         // Запись jg
         File.WriteAllText(PathTXT + "/jg.txt", String.Join("\n", jg.ToArray()), Encoding.UTF8);
+
+        // Запись jg для портрета
+        File.WriteAllText(PathTXT + "/jg_port.txt", String.Join(" ", jg.ToArray()));
 
         // Запись gg
         File.WriteAllText(PathTXT + "/gg.txt", String.Join("\n", gg.ToArray()), Encoding.UTF8);
 
+        // Запись gg для портрета
+        File.WriteAllText(PathTXT + "/gg_port.txt", String.Join(" ", gg.ToArray().Select(n => n.Real).ToArray()));
+
         // Запись di
         File.WriteAllText(PathTXT + "/di.txt", String.Join("\n", di.ToArray()), Encoding.UTF8);
+
+        // Запись di для портрета
+        File.WriteAllText(PathTXT + "/di_port.txt", String.Join(" ", di.ToArray().Select(n => n.Real).ToArray()));
 
         // Запись pr
         File.WriteAllText(PathTXT + "/pr.txt", String.Join("\n", pr.ToArray()), Encoding.UTF8);

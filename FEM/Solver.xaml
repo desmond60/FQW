@@ -27,7 +27,7 @@
             <DockPanel Canvas.Left="15"
                        Canvas.Top="15">
 
-                <TextBlock Text="&#956;: "
+                <TextBlock Text="&#957;: "
                            Margin="5"
                            FontSize="18"/>
                 <TextBox x:Name="NuBox"
@@ -39,7 +39,7 @@
                          PreviewTextInput="PreviewTextInputDouble"
                          TextChanged="NuBox_TextChanged"/>
 
-                <TextBlock Text="&#969;=2&#960;&#956;"
+                <TextBlock Text="&#969;=2&#960;&#957;"
                            Margin="5"
                            FontSize="18"/>
                 <TextBlock x:Name="WBox"

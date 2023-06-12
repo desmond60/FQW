@@ -29,7 +29,7 @@ public static class Helper
         );
 
         if (node.Y > 0.0) return mat;
-        
+
         for (int i = 0; i < layers.Count; i++) {
 
             if (node.Y < layers[i].Y) mat++;

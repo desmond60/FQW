@@ -17,7 +17,7 @@ public partial class Solver
 
         // Составление СЛАУ
         FEM fem = new FEM(grid, harm1d);
-        fem.TrySetParameter("Nu", nu * Nu0);
+        fem.TrySetParameter("Nu", nu);
         slau = fem.CreateSLAU();
 
         // Запись СЛАУ
@@ -63,15 +63,15 @@ public partial class Solver
 
         StringBuilder table = new StringBuilder(String.Format("{0,-5} | {1,-15} | {2,-15} | {3,-30} | {4,0} \n", "Приемник", "Re Ex", "Im Ex", "Hy", "Rk"));
 
-        for (int i = 0; i < receivers.Length; i++)
-        {
+        var list = receivers.ToList();
+        list.Reverse();
+        receivers = list.ToArray();
+        for (int i = 0; i < receivers.Length; i++) {
 
             // Находим узлы
             int id1 = 0, id2 = 0;
-            for (int j = 0; j < surface.Count - 1; j++)
-            {
-                if (receivers[i] >= surface[j].Item2.X && receivers[i] <= surface[j + 1].Item2.X)
-                {
+            for (int j = 0; j < surface.Count - 1; j++) {
+                if (receivers[i] >= surface[j].Item2.X && receivers[i] <= surface[j + 1].Item2.X) {
                     id1 = j;
                     id2 = j + 1;
                 }
@@ -90,8 +90,7 @@ public partial class Solver
             // Находим в какой элемент попадает приемник
             var node = new Node(receivers[i], 0);
             int id_elem = 0;
-            for (int j = 0; j < grid.Elems.Count; j++)
-            {
+            for (int j = 0; j < grid.Elems.Count; j++) {
                 if ((node.X >= grid.Nodes[grid.Elems[j].Node[0]].X && node.X < grid.Nodes[grid.Elems[j].Node[3]].X) &&
                     (node.Y > grid.Nodes[grid.Elems[j].Node[0]].Y && node.Y <= grid.Nodes[grid.Elems[j].Node[3]].Y))
                     id_elem = j;
@@ -165,13 +164,13 @@ public partial class Solver
 
     //: Обработка кнопки "Построить график Rk"
     private void DrawRkPlot_Click(object sender, RoutedEventArgs e) {
-        Rk rk = new Rk(lRk, receivers_str.Select(n => double.Parse(n)).OrderByDescending(n => n).ToList());
+        Rk rk = new Rk(lRk, receivers_str.Select(n => double.Parse(n)).OrderBy(n => n).ToList());
         rk.Show();
     }
 
     //: Обработка кнопки "Построить график Ex"
     private void DrawExPlot_Click(object sender, RoutedEventArgs e) {
-        Ex ex = new Ex(lEx, receivers_str.Select(n => double.Parse(n)).OrderByDescending(n => n).ToList());
+        Ex ex = new Ex(lEx, receivers_str.Select(n => double.Parse(n)).OrderBy(n => n).ToList());
         ex.Show();
     }
 }

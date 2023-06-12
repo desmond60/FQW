@@ -1,4 +1,7 @@
-﻿namespace FEM;
+﻿using FEM.grid;
+using ScottPlot;
+
+namespace FEM;
 
 // % ****** Логика взаимодействия с окошком MainWindow ***** % //
 public partial class MainWindow : Window
@@ -220,6 +223,50 @@ public partial class MainWindow : Window
             scatter.LineWidth = 5;
             scatter.MarkerColor = Color.DarkRed;
         }
+
+        // Рисование линий в воздухе, которые будут исключены после составления СЛАУ
+        /*
+        GridPlot.Refresh(); // Нужно чтоб без Warninga было
+        //GridPlot.Configuration.WarnIfRenderNotCalledManually = false; // или вот так можно отключить Warning
+        double left_b = grid.Nodes[0].X;
+        double right_b = grid.Nodes[^1].X;
+        double exit_y = grid.Nodes[^1].Y;
+        double temp = right_b;
+
+        for (int i = 0; i < grid.Elems.Count; i++) {
+
+            // Середина элемента
+            Node node = new Node(
+               (grid.Nodes[grid.Elems[i].Node[0]].X + grid.Nodes[grid.Elems[i].Node[1]].X) / 2.0,
+               (grid.Nodes[grid.Elems[i].Node[0]].Y + grid.Nodes[grid.Elems[i].Node[2]].Y) / 2.0
+            );
+
+            if (node.Y < 0.0) continue;
+
+            int num_up_edge = grid.Elems[i].Edge[3];
+            Edge up_edge = grid.Edges[num_up_edge];
+
+            dataX = new double[2] { up_edge.NodeBegin.X, up_edge.NodeEnd.X };
+            dataY = new double[2] { up_edge.NodeBegin.Y, up_edge.NodeEnd.Y };
+
+            if (Abs(up_edge.NodeEnd.Y - exit_y) <= 1e-10) return;
+
+            if (Abs(up_edge.NodeEnd.X - right_b) <= 1e-10 || Abs(up_edge.NodeBegin.X - right_b) <= 1e-10) {
+                if (Abs(temp - left_b) <= 1e-10) {
+                    var scatter = GridPlot.Plot.AddScatter(dataX, dataY, Color.Yellow);
+                    scatter.LineWidth = 3;
+                }
+                temp = temp == left_b ? right_b : left_b;
+                continue;
+            }
+
+            if (Abs(up_edge.NodeEnd.X - temp) <= 1e-10 || Abs(up_edge.NodeBegin.X - temp) <= 1e-10)
+                continue;
+
+            // Заносим ребро на график
+            var scatter1 = GridPlot.Plot.AddScatter(dataX, dataY, Color.Yellow);
+            scatter1.LineWidth = 3;
+        }*/
 
         // Настройки графика
         GridPlot.Plot.XAxis.Label("Ox");

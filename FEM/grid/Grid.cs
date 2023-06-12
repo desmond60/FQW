@@ -120,6 +120,41 @@ public struct Grid
             var sigma = FSigmas[i].Trim().Split(" ");
             Sigmas.Add((double.Parse(sigma[0]), double.Parse(sigma[1])));
         }
+
+        // Ребра, которые находятся в воздухе
+        double left_b = Nodes[0].X;
+        double right_b = Nodes[^1].X;
+        double exit_y = Nodes[^1].Y;
+        double temp = right_b;
+
+        for (int i = 0; i < Elems.Count; i++) {
+
+            // Середина элемента
+            Node node = new Node(
+               (Nodes[Elems[i].Node[0]].X + Nodes[Elems[i].Node[1]].X) / 2.0,
+               (Nodes[Elems[i].Node[0]].Y + Nodes[Elems[i].Node[2]].Y) / 2.0
+            );
+
+            if (node.Y < 0.0) continue;
+
+            int num_up_edge = Elems[i].Edge[3];
+            Edge up_edge = Edges[num_up_edge];
+
+            if (Abs(up_edge.NodeEnd.Y - exit_y) <= 1e-10) return;
+
+            if (Abs(up_edge.NodeEnd.X - right_b) <= 1e-10 || Abs(up_edge.NodeBegin.X - right_b) <= 1e-10) {
+                if (Abs(temp - left_b) <= 1e-10)
+                    Bounds.Add(new Bound(1, 4, num_up_edge));
+                temp = temp == left_b ? right_b : left_b;
+                continue;
+            }
+
+            if (Abs(up_edge.NodeEnd.X - temp) <= 1e-10 || Abs(up_edge.NodeBegin.X - temp) <= 1e-10)
+                continue;
+
+            // Заносим ребро как краевое
+            Bounds.Add(new Bound(1, 4, num_up_edge));
+        }
     }
 
     //: Деконструктор
