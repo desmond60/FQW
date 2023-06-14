@@ -36,7 +36,7 @@ public class FEM
         Portrait portrait = new Portrait(Edges.Count);
 
         // Генерируем массивы ig и jg и размерность
-        portrait.GenPortrait(ref slau.ig, ref slau.jg, Elems.ToArray());
+        portrait.GenPortrait(ref slau.ig, ref slau.jg, Elems.ToArray(), Bounds);
         slau.N = Edges.Count;
 
         // Выделяем память
@@ -211,9 +211,10 @@ public class FEM
                         (iend, temp) = (temp, iend);
 
                     h = slau.ig[temp];
-                    while (slau.jg[h++] - iend != 0) ;
-                    --h;
-                    slau.gg[h] += mat[i, j];
+                    for (int k = h; k < slau.ig[temp + 1]; k++) {
+                        if (slau.jg[k] - iend == 0)
+                            slau.gg[k] += mat[i, j];
+                    }
                 }
                 slau.di[ibeg] += mat[i, i];
             //}
@@ -237,20 +238,20 @@ public class FEM
         slau.pr[row] = value;
 
         // Зануляем в треугольнике (столбцы)
-        for (int i = slau.ig[row]; i < slau.ig[row + 1]; i++) {
+/*        for (int i = slau.ig[row]; i < slau.ig[row + 1]; i++) {
             slau.pr[slau.jg[i]] -= slau.gg[i] * value;
             slau.gg[i] = 0;
-        }
+        }*/
 
         // Зануляем в треугольнике (строки)
-        for (int i = row + 1; i < slau.N; i++) {
+/*        for (int i = row + 1; i < slau.N; i++) {
             for (int j = slau.ig[i]; j < slau.ig[i + 1]; j++) {
                 if (slau.jg[j] == row) {
                     slau.pr[i] -= slau.gg[j] * value;
                     slau.gg[j] = 0;
                 }
             }
-        }
+        }*/
     }
 
     //: Учет естественного краевого условия

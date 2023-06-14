@@ -174,8 +174,10 @@ public partial class MainWindow : Window
                 dataX[j] = grid.Nodes[i * CountX + j].X;
                 dataY[j] = grid.Nodes[i * CountX + j].Y;
             }
-            if (ListContains(layers, dataY[0]))
-                GridPlot.Plot.AddScatter(dataX, dataY, Color.OrangeRed);
+            if (ListContains(layers, dataY[0])) {
+                var scatter = GridPlot.Plot.AddScatter(dataX, dataY, Color.DarkViolet);
+                scatter.LineWidth = 2.5;
+            }
             else
                 GridPlot.Plot.AddScatter(dataX, dataY, Color.Blue);
         }
@@ -225,8 +227,8 @@ public partial class MainWindow : Window
         }
 
         // Рисование линий в воздухе, которые будут исключены после составления СЛАУ
-        /*
-        GridPlot.Refresh(); // Нужно чтоб без Warninga было
+        
+        /*GridPlot.Refresh(); // Нужно чтоб без Warninga было
         //GridPlot.Configuration.WarnIfRenderNotCalledManually = false; // или вот так можно отключить Warning
         double left_b = grid.Nodes[0].X;
         double right_b = grid.Nodes[^1].X;
@@ -253,7 +255,7 @@ public partial class MainWindow : Window
 
             if (Abs(up_edge.NodeEnd.X - right_b) <= 1e-10 || Abs(up_edge.NodeBegin.X - right_b) <= 1e-10) {
                 if (Abs(temp - left_b) <= 1e-10) {
-                    var scatter = GridPlot.Plot.AddScatter(dataX, dataY, Color.Yellow);
+                    var scatter = GridPlot.Plot.AddScatter(dataX, dataY, Color.DarkRed);
                     scatter.LineWidth = 3;
                 }
                 temp = temp == left_b ? right_b : left_b;
@@ -264,7 +266,7 @@ public partial class MainWindow : Window
                 continue;
 
             // Заносим ребро на график
-            var scatter1 = GridPlot.Plot.AddScatter(dataX, dataY, Color.Yellow);
+            var scatter1 = GridPlot.Plot.AddScatter(dataX, dataY, Color.DarkRed);
             scatter1.LineWidth = 3;
         }*/
 

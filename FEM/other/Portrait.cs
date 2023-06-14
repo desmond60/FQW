@@ -1,4 +1,6 @@
-﻿namespace FEM;
+﻿using FEM.grid;
+
+namespace FEM;
 
 //: Класс создания портрета
 public class Portrait
@@ -16,7 +18,7 @@ public class Portrait
     }
 
     //: Генерация ig, jg (размерность - n)
-    public void GenPortrait(ref Vector<int> ig, ref Vector<int> jg, Elem[] elems)
+    public void GenPortrait(ref Vector<int> ig, ref Vector<int> jg, Elem[] elems, List<Bound> bound)
     {
 
         // ***** Никитина построение портрета ***** // Быстрое
@@ -32,7 +34,8 @@ public class Portrait
                 int nodeToInsert = element[i];
                 for (int j = i + 1; j < localSize; j++) {
                     int posToInsert = element[j];
-                    connectivityList[posToInsert].Add(nodeToInsert);
+                    if (!bound.Exists(n => (n.Edge == nodeToInsert || n.Edge == posToInsert)))
+                        connectivityList[posToInsert].Add(nodeToInsert);
                 }
             }
 
