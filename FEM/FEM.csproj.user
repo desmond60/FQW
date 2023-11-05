@@ -10,6 +10,9 @@
     <Compile Update="Ex.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Neuronet.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Rk.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -22,6 +25,9 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Update="MainWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Neuronet.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="Rk.xaml">

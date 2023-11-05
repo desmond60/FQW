@@ -18,24 +18,26 @@ public class FEM
     public Harm1D         harm1D    { get; set; }   // Структура одномерной задачи
 
     //: Конструктор FEM
-    public FEM(Grid grid, Harm1D harm1D) {
+    public FEM(Grid grid, Harm1D harm1D)
+    {
         (Nodes, Edges, Elems, Bounds, Items, Layers, Sigmas) = grid;
         this.harm1D = harm1D;
         this.slau = new SLAU();
     }
 
     //: Метод составления СЛАУ
-    public SLAU CreateSLAU() {
+    public SLAU CreateSLAU()
+    {
         portrait();               // Составление портрета
         global();                 // Составление глобальной матрицы
         return slau;
     }
 
     //: Составление портрета
-    private void portrait() {
-        Portrait portrait = new Portrait(Edges.Count);
-
+    private void portrait()
+    {
         // Генерируем массивы ig и jg и размерность
+        Portrait portrait = new Portrait(Edges.Count);
         portrait.GenPortrait(ref slau.ig, ref slau.jg, Elems.ToArray(), Bounds);
         slau.N = Edges.Count;
 
@@ -47,8 +49,8 @@ public class FEM
     }
 
     //: Составление глобальной матрицы
-    private void global() {
-        
+    private void global()
+    {
         // Обходим конечные элементы
         for (int index_fin_el = 0; index_fin_el < Elems.Count; index_fin_el++) {
             
@@ -71,8 +73,8 @@ public class FEM
     }
 
     //: Построение локальной матрицы и вектора
-    private (ComplexMatrix, ComplexVector) local(int index_fin_el) {
-
+    private (ComplexMatrix, ComplexVector) local(int index_fin_el)
+    {
         // Подсчет компонент
         double hx = Nodes[Elems[index_fin_el].Node[1]].X - Nodes[Elems[index_fin_el].Node[0]].X;
         double hy = Nodes[Elems[index_fin_el].Node[2]].Y - Nodes[Elems[index_fin_el].Node[0]].Y;
@@ -86,8 +88,8 @@ public class FEM
     }
 
     //: Построение матрицы жесткости (G)
-    private Matrix<double> build_G(int index_fin_el, double hx, double hy) {
-
+    private Matrix<double> build_G(int index_fin_el, double hx, double hy)
+    {
         // Подсчет коэффициентов для основной задачи
         double coef_y_on_x = hy / hx;
         double coef_x_on_y = hx / hy;
@@ -115,8 +117,8 @@ public class FEM
     }
 
     //: Построение матрицы масс (M)
-    private ComplexMatrix build_M(int index_fin_el, double hx, double hy) {
-
+    private ComplexMatrix build_M(int index_fin_el, double hx, double hy)
+    {
         // Подсчет коэффициента для основной задачи
         double coef = (W * Sigmas[Elems[index_fin_el].Material - 1].Sigma2D * hx * hy) / 6.0;
 
@@ -132,8 +134,8 @@ public class FEM
     }
 
     //: Построение вектора правой части (F)
-    private ComplexVector build_F(int index_fin_el, double hx, double hy) {
-
+    private ComplexVector build_F(int index_fin_el, double hx, double hy)
+    {
         // Подсчет коэффициента
         double coef = (hx * hy) / 6.0;
 
@@ -171,8 +173,8 @@ public class FEM
         return M_matrix * f;
     }
 
-    private Complex F(Edge edge) {
-
+    private Complex F(Edge edge)
+    {
         // Строим узел
         Node node = edge.NodeBegin.Y == edge.NodeEnd.Y ?
              new Node((edge.NodeBegin.X + edge.NodeEnd.X) / 2.0, edge.NodeBegin.Y) :
@@ -198,10 +200,11 @@ public class FEM
     }
 
     //: Занесение матрицы в глоабальную матрицу
-    private void EntryMatInGlobalMatrix(ComplexMatrix mat, int[] index) {
+    private void EntryMatInGlobalMatrix(ComplexMatrix mat, int[] index)
+    {
         for (int i = 0, h = 0; i < mat.Rows; i++) {
             int ibeg = index[i];
-            //if (!Bounds.Exists(n => n.Edge == ibeg)) {
+            if (!Bounds.Exists(n => n.Edge == ibeg)) {
                 for (int j = i + 1; j < mat.Columns; j++)
                 {
                     int iend = index[j];
@@ -217,7 +220,7 @@ public class FEM
                     }
                 }
                 slau.di[ibeg] += mat[i, i];
-            //}
+            }
         }
     }
 
@@ -238,15 +241,19 @@ public class FEM
         slau.pr[row] = value;
 
         // Зануляем в треугольнике (столбцы)
-/*        for (int i = slau.ig[row]; i < slau.ig[row + 1]; i++) {
+/*        for (int i = slau.ig[row]; i < slau.ig[row + 1]; i++)
+        {
             slau.pr[slau.jg[i]] -= slau.gg[i] * value;
             slau.gg[i] = 0;
-        }*/
+        }
 
         // Зануляем в треугольнике (строки)
-/*        for (int i = row + 1; i < slau.N; i++) {
-            for (int j = slau.ig[i]; j < slau.ig[i + 1]; j++) {
-                if (slau.jg[j] == row) {
+        for (int i = row + 1; i < slau.N; i++)
+        {
+            for (int j = slau.ig[i]; j < slau.ig[i + 1]; j++)
+            {
+                if (slau.jg[j] == row)
+                {
                     slau.pr[i] -= slau.gg[j] * value;
                     slau.gg[j] = 0;
                 }

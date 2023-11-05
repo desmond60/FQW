@@ -3,10 +3,9 @@
 //: Обработчики Button
 public partial class MainWindow
 {
-
     //: Обработка кнопки "Добавить слой"
-    private void AddLayer_Click(object sender, RoutedEventArgs e) {
-
+    private void AddLayer_Click(object sender, RoutedEventArgs e)
+    {
         // Если значение слоя пусто
         if (TextLayer.Text == String.Empty || TextLayerSigma.Text == String.Empty || layers_str.Contains(TextLayer.Text + " " + TextLayerSigma.Text)) {
             MessageBox.Show("Значение слоя не указано или такой слой уже задан!");
@@ -17,8 +16,8 @@ public partial class MainWindow
     }
 
     //: Обработка кнопки "Удалить слой"
-    private void RemoveLayer_Click(object sender, RoutedEventArgs e) {
-
+    private void RemoveLayer_Click(object sender, RoutedEventArgs e)
+    {
         // Если слой не выбран
         if (layersList.SelectedValue == null) {
             MessageBox.Show("Выберете слой!");
@@ -29,8 +28,8 @@ public partial class MainWindow
     }
 
     //: Обработка кнопки "Добавить объект"
-    private void AddItem_Click(object sender, RoutedEventArgs e) {
-
+    private void AddItem_Click(object sender, RoutedEventArgs e)
+    {
         // Если имя объекта не указано
         if (TextItem.Text == String.Empty || TextItemSigma.Text == String.Empty || items_str.Contains(TextItem.Text + " " + TextItemSigma.Text)) {
             MessageBox.Show("Имя такого объекта уже существует или поля пустые!");
@@ -54,8 +53,8 @@ public partial class MainWindow
     }
 
     //: Обработка кнопки "Удалить объект"
-    private void RemoveItem_Click(object sender, RoutedEventArgs e) {
-
+    private void RemoveItem_Click(object sender, RoutedEventArgs e)
+    {
         // Если объект не выбран
         if (itemsList.SelectedValue == null) {
             MessageBox.Show("Выберете объект!");
@@ -68,8 +67,8 @@ public partial class MainWindow
     }
 
     //: Обработка кнопки "Изменить объект"
-    private void EditItem_Click(object sender, RoutedEventArgs e) {
-
+    private void EditItem_Click(object sender, RoutedEventArgs e)
+    {
         // Если объект не выбран
         if (itemsList.SelectedValue == null) {
             MessageBox.Show("Выберете объект!");
@@ -95,14 +94,13 @@ public partial class MainWindow
         itemsList.Items.Refresh();
     }
 
-
     //: Обработка кнопки "Построить сетку"
-    private void BuildGrid_Click(object sender, RoutedEventArgs e) {
-
+    private void BuildGrid_Click(object sender, RoutedEventArgs e)
+    {
         if (items.Count == 0) {
             if (Directory.Exists(@"grid")) {
-                grid.LoadGrid();
-                LoadInterface();
+                grid.LoadGrid(@"grid");
+                LoadInterface(@"grid");
                 DrawGrid();
             }
             else
@@ -111,21 +109,36 @@ public partial class MainWindow
         }
         
         UpdateComponent(); // Обновляем компоненты
-        CreateGrid();      // Строим сетку
-        grid.WriteGrid();  // Запись сетки
-        WriteInterface();  // Запись интерфейса
-        DrawGrid();        // Рисуем сетку
+
+        // Строим сетку
+        Generate generate = new Generate(items, layers, IsStrictGrid);
+        generate.TrySetParameter("Kx", Kx);
+        generate.TrySetParameter("Ky", Ky);
+        generate.TrySetParameter("min_step", min_step);
+        generate.TrySetParameter("min_count_step", min_count_step);
+        generate.TrySetParameter("Begin_BG", Begin_BG);
+        generate.TrySetParameter("End_BG", End_BG);
+        generate.TrySetParameter("SideBound", SideBound);
+        grid = generate.CreateGrid();
+
+        // Для графика
+        CountX = grid.CountX;
+        CountY = grid.CountY;
+
+        grid.WriteGrid(@"grid"); // Запись сетки
+        WriteInterface(@"grid", grid); // Запись интерфейса
+        DrawGrid(); // Рисуем сетку
     }
 
     //: Обработка кнопки "Решатель"
-    private void Solution_Click(object sender, RoutedEventArgs e) {
-
+    private void Solution_Click(object sender, RoutedEventArgs e)
+    {
         if (!Directory.Exists(@"grid")) {
             MessageBox.Show("Папка с сеткой (grid) не обнаружена. Постройте сетку!");
             return;
         }
 
         Solver solver = new Solver();
-        solver.Show();
+        solver.ShowDialog();
     }
 }

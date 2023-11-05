@@ -3,12 +3,14 @@
 //: Статический класс "Помощник"
 public static class Helper
 {
+    public static Random rnd = new Random();
+
     public static double Nu0 = 4 * PI * 1e-7; // Вакуумная магнитная проницаемость
 
     //: Метод проверки элемента в листе Double точность
-    public static bool ListContains(List<Layer> list, double value) {
+    public static bool ListContains(List<Layer> list, double value)
+    {
         bool result = false;
-
         foreach (var item in list) {
             if (Abs(item.Y - value) <= 1e-6)
                 result = true;
@@ -18,8 +20,8 @@ public static class Helper
     }
 
     //: Вычислить материал КЭ
-    public static int GetMaterial(List<Layer> layers, List<Item> items, List<Node> nodes, Elem elem) {
-
+    public static int GetMaterial(List<Layer> layers, List<Item> items, List<Node> nodes, Elem elem)
+    {
         int mat = 1;
 
         // Середина элемента
@@ -61,8 +63,8 @@ public static class Helper
     }
 
     //: Найти объекты с пересечением слоя
-    public static int[] GetIdItems(List<Item> items, List<Layer> layers, int index) {
-
+    public static int[] GetIdItems(List<Item> items, List<Layer> layers, int index)
+    {
         List<int> id = new List<int>();
         List<(int, Item)> id_item = new List<(int, Item)>();
 
@@ -93,7 +95,8 @@ public static class Helper
     }
 
     //: Скалярное произведение векторов
-    public static Complex Scalar(ComplexVector frst, ComplexVector scnd) {
+    public static Complex Scalar(ComplexVector frst, ComplexVector scnd)
+    {
         Complex res = 0;
         for (int i = 0; i < frst.Length; i++)
             res += frst[i] * scnd[i];
@@ -101,7 +104,8 @@ public static class Helper
     }
 
     //: Модуль комплексного вектора
-    public static double Norm(ComplexVector vec) {
+    public static double Norm(ComplexVector vec)
+    {
         double norm = 0;
         for (int i = 0; i < vec.Length; i++)
             norm += vec[i].Real * vec[i].Real + vec[i].Imaginary * vec[i].Imaginary;

@@ -1,7 +1,4 @@
-﻿using FEM.grid;
-using ScottPlot;
-
-namespace FEM;
+﻿namespace FEM;
 
 // % ****** Логика взаимодействия с окошком MainWindow ***** % //
 public partial class MainWindow : Window
@@ -20,10 +17,9 @@ public partial class MainWindow : Window
     int CountX, CountY;     // Количество узлов по Осям для графика
     double Kx, Ky;          // Коэффициент разрядки от объекта
     double min_step;        // Минимальный шаг по объекту
-    int min_count_step;     // Минимальное количество шагов по оюъекту
+    int min_count_step;     // Минимальное количество шагов по объекту
 
     bool IsStrictGrid  = false;   // Строгая ли сетка?
-    double e = 0.01;   // e = 0.01*l не должно быть узких мест в сетке
 
     List<string> layers_str  = new List<string>();   // Горизонтальные слои для ListBox
     List<string> items_str   = new List<string>();   // Объекты для  ListBox
@@ -35,7 +31,8 @@ public partial class MainWindow : Window
     /* ----------------------- Переменные --------------------------------- */
 
     //: Обновление компонент
-    private void UpdateComponent() {
+    private void UpdateComponent()
+    {
         Begin_BG[0]  = Double.Parse(Begin_BG_X.Text);
         Begin_BG[1]  = Double.Parse(Begin_BG_Y.Text);
         End_BG[0]    = Double.Parse(End_BG_X.Text);
@@ -63,23 +60,24 @@ public partial class MainWindow : Window
     }
 
     //: Запись интерфейса
-    private void WriteInterface() {
+    private void WriteInterface(string path, Grid grid)
+    {
         StringBuilder interface_str = new StringBuilder();
 
-        interface_str.Append($"{Begin_BG[0]} {Begin_BG[1]} {End_BG[0]} {End_BG[1]}\n");
-        interface_str.Append($"{CountX} {CountY}\n");
-        interface_str.Append($"{Kx} {Ky}\n");
-        interface_str.Append($"{min_step} {min_count_step}\n");
-        interface_str.Append($"{IsStrictGrid}\n");
-        interface_str.Append($"{SideBound[0]} {SideBound[1]} {SideBound[2]} {SideBound[3]}\n");
+        interface_str.Append($"{grid.Begin_BG[0]} {grid.Begin_BG[1]} {grid.End_BG[0]} {grid.End_BG[1]}\n");
+        interface_str.Append($"{grid.CountX} {grid.CountY}\n");
+        interface_str.Append($"{grid.Kx} {grid.Ky}\n");
+        interface_str.Append($"{grid.min_step} {grid.min_count_step}\n");
+        interface_str.Append($"{grid.IsStrictGrid}\n");
+        interface_str.Append($"{grid.SideBound[0]} {grid.SideBound[1]} {grid.SideBound[2]} {grid.SideBound[3]}\n");
 
-        File.WriteAllText(@"grid/interface.txt", interface_str.ToString());
+        File.WriteAllText(path + @"/interface.txt", interface_str.ToString());
     }
 
     //: Загрузка интерфейса из grid
-    private void LoadInterface() {
-
-        string[] interface_str = File.ReadAllLines(@"grid/interface.txt");
+    private void LoadInterface(string path)
+    {
+        string[] interface_str = File.ReadAllLines(path + @"/interface.txt");
 
         // Установка точек большого поля
         var line = interface_str[0].Trim().Split(" ");
@@ -123,44 +121,43 @@ public partial class MainWindow : Window
         Side3Text.Text = SideBound[3].ToString();
 
         // Добавление слоев
+        layers.Clear();
+        layers_str.Clear();
         for (int i = 0; i < grid.Layers.Count; i++) {
             layers_str.Add(grid.Layers[i].ToString());
             layers.Add(grid.Layers[i]);
         }
         layersList.Items.Refresh();
 
+        // Первый слой
+        string[] name = layers_str[0].Split(" ");
+        TextLayer.Text = name[0];
+        TextLayerSigma.Text = name[1];
+
         // Добавление объектов
+        items.Clear();
+        items_str.Clear();
         for (int i = 0; i < grid.Items.Count; i++) {
             items_str.Add(grid.Items[i].Name + " " + grid.Items[i].Sigma);
             items.Add(grid.Items[i]);
         }
         itemsList.Items.Refresh();
-    }
 
-    //: Построение сетки
-    private void CreateGrid() {
-
-        // Генерация узлов
-        List<Node> nodes = generate_node();
-
-        // Генерация элементов
-        List<Elem> elems = generate_elem();
-
-        // Генерация ребер
-        List<Edge> edges = generate_edge(elems, nodes);
-
-        // Генерация краевых
-        List<Bound> bounds = generate_bound(edges);
-
-        // Генерация проводимости
-        List<(double, double)> sigmas = generate_sigma();
-
-        grid =  new Grid(nodes, edges, elems, bounds, items, layers, sigmas);
+        // Первый объект
+        Item item = items[0];
+        Begin_SML_X.Text = item.Begin[0].ToString();
+        Begin_SML_Y.Text = item.Begin[1].ToString();
+        End_SML_X.Text = item.End[0].ToString();
+        End_SML_Y.Text = item.End[1].ToString();
+        N_X.Text = item.Nx.ToString();
+        N_Y.Text = item.Ny.ToString();
+        TextItemSigma.Text = item.Sigma.ToString();
+        TextItem.Text = item.Name;
     }
 
     //: Рисование сетки
-    private void DrawGrid() {
-
+    private void DrawGrid()
+    {
         // Очищаем график
         GridPlot.Plot.Clear();
 
@@ -269,7 +266,7 @@ public partial class MainWindow : Window
             var scatter1 = GridPlot.Plot.AddScatter(dataX, dataY, Color.DarkRed);
             scatter1.LineWidth = 3;
         }*/
-
+        
         // Настройки графика
         GridPlot.Plot.XAxis.Label("Ox");
         GridPlot.Plot.YAxis.Label("Oz");

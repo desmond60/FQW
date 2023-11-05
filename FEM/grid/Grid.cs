@@ -12,6 +12,18 @@ public struct Grid
     public List<Layer>  Layers; // Слои
     public List<(double Sigma1D, double Sigma2D)> Sigmas; // Значения проводимости
 
+    // Для сетки и генерации нейронки
+    public bool IsStrictGrid = false; // Строгая ли сетка?
+
+    public int[] SideBound; // Номера краевых на сторонах
+    public Vector<double> Begin_BG = new Vector<double>(2); // Левая-Нижняя точка (Большого поля)
+    public Vector<double> End_BG = new Vector<double>(2);   // Правая-Верхняя точка (Большого поля)
+
+    public int CountX, CountY; // Количество узлов по Осям для графика
+    public double Kx, Ky;      // Коэффициент разрядки от объекта
+    public double min_step;    // Минимальный шаг по объекту
+    public int min_count_step; // Минимальное количество шагов по объекту
+
     //: Конструктор
     public Grid(List<Node> nodes, List<Edge> edges, List<Elem> elems, List<Bound> bounds, List<Item> items, List<Layer> layers, List<(double, double)> sigmas) {
         Nodes  = nodes;
@@ -23,41 +35,68 @@ public struct Grid
         Sigmas = sigmas;
     }
 
-    //: Записать сетку
-    public void WriteGrid() {
+    //: Установка параметров (bool)
+    public void TrySetParameter(string name, bool value) {
+        if (name == nameof(IsStrictGrid)) IsStrictGrid = value;
+    }
 
-        Directory.CreateDirectory(@"grid");
-        Directory.CreateDirectory(@"slau/slauTXT");
-        Directory.CreateDirectory(@"slau/slauBIN");
-        Directory.CreateDirectory(@"harm1d");
+    //: Установка параметров (int[])
+    public void TrySetParameter(string name, int[] value) {
+        if (name == nameof(SideBound)) SideBound = value;
+    }
+
+    //: Установка параметров (Vector<double>)
+    public void TrySetParameter(string name, Vector<double> value) {
+        if (name == nameof(Begin_BG)) Begin_BG = (Vector<double>)value.Clone();
+        if (name == nameof(End_BG)) End_BG = (Vector<double>)value.Clone();
+    }
+
+    //: Установка параметров (double)
+    public void TrySetParameter(string name, double value) {
+        if (name == nameof(Kx)) Kx = value;
+        if (name == nameof(Ky)) Ky = value;
+        if (name == nameof(min_step)) min_step = value;
+    }
+
+    //: Установка параметров (int)
+    public void TrySetParameter(string name, int value) {
+        if (name == nameof(min_count_step)) min_count_step = value;
+        if (name == nameof(CountX)) CountX = value;
+        if (name == nameof(CountY)) CountY = value;
+    }
+
+    //: Записать сетку
+    public void WriteGrid(string path) {
+
+        Directory.CreateDirectory(path);
 
         // Запись узлов сетки
-        File.WriteAllText(@"grid/nodes.txt", $"{Nodes.Count} \n" + String.Join("\n", Nodes), Encoding.UTF8);
+        File.WriteAllText(path + @"/nodes.txt", $"{Nodes.Count} \n" + String.Join("\n", Nodes), Encoding.UTF8);
 
         // Запись КЭ
-        File.WriteAllText(@"grid/elems.txt", $"{Elems.Count} \n" + String.Join("\n", Elems), Encoding.UTF8);
+        File.WriteAllText(path + @"/elems.txt", $"{Elems.Count} \n" + String.Join("\n", Elems), Encoding.UTF8);
 
         // Записб ребер
-        File.WriteAllText(@"grid/edges.txt", $"{Edges.Count} \n" + String.Join("\n", Edges), Encoding.UTF8);
+        File.WriteAllText(path + @"/edges.txt", $"{Edges.Count} \n" + String.Join("\n", Edges), Encoding.UTF8);
 
         // Запись краевых
-        File.WriteAllText(@"grid/bounds.txt", $"{Bounds.Count} \n" + String.Join("\n", Bounds), Encoding.UTF8);
+        File.WriteAllText(path + @"/bounds.txt", $"{Bounds.Count} \n" + String.Join("\n", Bounds), Encoding.UTF8);
 
         // Запись объектов
-        File.WriteAllText(@"grid/items.txt", $"{Items.Count} \n" + String.Join("\n", Items), Encoding.UTF8);
+        File.WriteAllText(path + @"/items.txt", $"{Items.Count} \n" + String.Join("\n", Items), Encoding.UTF8);
 
         // Запись слоев
-        File.WriteAllText(@"grid/layers.txt", $"{Layers.Count} \n" + String.Join("\n", Layers), Encoding.UTF8);
+        File.WriteAllText(path + @"/layers.txt", $"{Layers.Count} \n" + String.Join("\n", Layers), Encoding.UTF8);
 
         // Запись проводимости
-        File.WriteAllText(@"grid/sigmas.txt", $"{Sigmas.Count} \n" + String.Join("\n", Sigmas.Select(n => n.Sigma1D + " " + n.Sigma2D)), Encoding.UTF8);
+        File.WriteAllText(path + @"/sigmas.txt", $"{Sigmas.Count} \n" + String.Join("\n", Sigmas.Select(n => n.Sigma1D + " " + n.Sigma2D)), Encoding.UTF8);
     }
 
     //: Загрузить сетку
-    public void LoadGrid() {
+    public void LoadGrid(string path) {
 
         // Чтение узлов
-        string[] Fnodes = File.ReadAllLines(@"grid/nodes.txt");
+        string[] Fnodes = File.ReadAllLines(path + @"/nodes.txt");
         Nodes = new List<Node>();
         for (int i = 1; i < int.Parse(Fnodes[0]) + 1; i++) {
             var node = Fnodes[i].Trim().Split(" ");
@@ -65,7 +104,7 @@ public struct Grid
         }
 
         // Чтение элементов
-        string[] FElems = File.ReadAllLines(@"grid/elems.txt");
+        string[] FElems = File.ReadAllLines(path + @"/elems.txt");
         Elems = new List<Elem>();
         for (int i = 1; i < int.Parse(FElems[0]) + 1; i++) {
             var elem = FElems[i].Trim().Split(" ");
@@ -75,7 +114,7 @@ public struct Grid
         }
 
         // Чтение ребер
-        string[] FEdges = File.ReadAllLines(@"grid/edges.txt");
+        string[] FEdges = File.ReadAllLines(path + @"/edges.txt");
         Edges = new List<Edge>();
         for (int i = 1; i < int.Parse(FEdges[0]) + 1; i++) {
             var edge = FEdges[i].Trim().Split(" ");
@@ -85,7 +124,7 @@ public struct Grid
         }
 
         // Чтение краевых
-        string[] FBounds = File.ReadAllLines(@"grid/bounds.txt");
+        string[] FBounds = File.ReadAllLines(path + @"/bounds.txt");
         Bounds = new List<Bound>();
         for (int i = 1; i < int.Parse(FBounds[0]) + 1; i++) {
             var bound = FBounds[i].Trim().Split(" ");
@@ -93,7 +132,7 @@ public struct Grid
         }
 
         // Чтение объектов
-        string[] FItems = File.ReadAllLines(@"grid/items.txt");
+        string[] FItems = File.ReadAllLines(path + @"/items.txt");
         Items = new List<Item>();
         for (int i = 1; i < int.Parse(FItems[0]) + 1; i++) {
             var item = FItems[i].Trim().Split(" ");
@@ -106,7 +145,7 @@ public struct Grid
         }
 
         // Чтение слоев
-        string[] FLayers = File.ReadAllLines(@"grid/layers.txt");
+        string[] FLayers = File.ReadAllLines(path + @"/layers.txt");
         Layers = new List<Layer>();
         for (int i = 1; i < int.Parse(FLayers[0]) + 1; i++) {
             var layer = FLayers[i].Trim().Split(" ");
@@ -114,7 +153,7 @@ public struct Grid
         }
 
         // Чтение проводимости
-        string[] FSigmas = File.ReadAllLines(@"grid/sigmas.txt");
+        string[] FSigmas = File.ReadAllLines(path + @"/sigmas.txt");
         Sigmas = new List<(double Sigma1D, double Sigma2D)>();
         for (int i = 1; i < int.Parse(FSigmas[0]) + 1; i++) {
             var sigma = FSigmas[i].Trim().Split(" ");
@@ -158,11 +197,11 @@ public struct Grid
     }
 
     //: Деконструктор
-    public void Deconstruct(out List<Node>    nodes,
-                            out List<Edge>    edges,
-                            out List<Elem>    elems,
-                            out List<Bound>   kraevs,
-                            out List<Item>    items,
+    public void Deconstruct(out List<Node>   nodes,
+                            out List<Edge>   edges,
+                            out List<Elem>   elems,
+                            out List<Bound>  kraevs,
+                            out List<Item>   items,
                             out List<Layer>  layers,
                             out List<(double, double)> sigmas) {
         edges  = Edges;

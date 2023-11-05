@@ -1,6 +1,4 @@
-﻿using FEM.grid;
-
-namespace FEM;
+﻿namespace FEM;
 
 //: Класс создания портрета
 public class Portrait
@@ -20,7 +18,6 @@ public class Portrait
     //: Генерация ig, jg (размерность - n)
     public void GenPortrait(ref Vector<int> ig, ref Vector<int> jg, Elem[] elems, List<Bound> bound)
     {
-
         // ***** Никитина построение портрета ***** // Быстрое
         var connectivityList = new List<HashSet<int>>();
 

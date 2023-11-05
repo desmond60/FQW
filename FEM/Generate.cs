@@ -1,8 +1,85 @@
 namespace FEM;
 
-//: Построение сетки
-public partial class MainWindow : Window
+//: Класс построение сетки
+public class Generate
 {
+    List<Item> items = new List<Item>();    // Объекты на сетке
+    List<Layer> layers = new List<Layer>(); // Горизонтальные слои
+    bool IsStrictGrid = false;              // Строгая ли сетка?
+
+    int[] SideBound; // Номера краевых на сторонах
+    Vector<double> Begin_BG = new Vector<double>(2); // Левая-Нижняя точка (Большого поля)
+    Vector<double> End_BG = new Vector<double>(2);   // Правая-Верхняя точка (Большого поля)
+    double e = 0.01;   // e = 0.01*l не должно быть узких мест в сетке
+
+    int CountX, CountY; // Количество узлов по Осям для графика
+    double Kx, Ky;      // Коэффициент разрядки от объекта
+    double min_step;    // Минимальный шаг по объекту
+    int min_count_step; // Минимальное количество шагов по объекту
+
+    //: Конструктор
+    public Generate(List<Item> _items, List<Layer> _layers, bool isStrictGrid = false)
+    {
+        this.items = _items;
+        this.layers = _layers;
+        this.IsStrictGrid = isStrictGrid;
+    }
+
+    //: Установка параметров для Generate (double)
+    public void TrySetParameter(string name, double value) {
+        if (name == nameof(Kx)) Kx = value;
+        if (name == nameof(Ky)) Ky = value;
+        if (name == nameof(min_step)) min_step = value;
+    }
+
+    //: Установка параметров для Generate (int)
+    public void TrySetParameter(string name, int value) {
+        if (name == nameof(min_count_step)) min_count_step = value;
+    }
+
+    //: Установка параметров для Generate (int[])
+    public void TrySetParameter(string name, int[] value) {
+        if (name == nameof(SideBound)) SideBound = value;
+    }
+
+    //: Установка параметров для Generate (Vector<double>)
+    public void TrySetParameter(string name, Vector<double> value) {
+        if (name == nameof(Begin_BG)) Begin_BG = (Vector<double>)value.Clone();
+        if (name == nameof(End_BG)) End_BG = (Vector<double>)value.Clone();
+    }
+
+    //: Генерация сетки
+    public Grid CreateGrid()
+    {
+        // Генерация узлов
+        List<Node> nodes = generate_node();
+
+        // Генерация элементов
+        List<Elem> elems = generate_elem();
+
+        // Генерация ребер
+        List<Edge> edges = generate_edge(elems, nodes);
+
+        // Генерация краевых
+        List<Bound> bounds = generate_bound(edges);
+
+        // Генерация проводимости
+        List<(double, double)> sigmas = generate_sigma();
+
+        Grid grid = new Grid(nodes, edges, elems, bounds, items, layers, sigmas);
+        grid.TrySetParameter("IsStrictGrid", IsStrictGrid);
+        grid.TrySetParameter("SideBound", SideBound);
+        grid.TrySetParameter("Begin_BG", Begin_BG);
+        grid.TrySetParameter("End_BG", End_BG);
+        grid.TrySetParameter("Kx", Kx);
+        grid.TrySetParameter("Ky", Ky);
+        grid.TrySetParameter("min_step", min_step);
+        grid.TrySetParameter("min_count_step", min_count_step);
+        grid.TrySetParameter("CountX", CountX);
+        grid.TrySetParameter("CountY", CountY);
+
+       return grid;
+    }
 
     //: Генерация узлов сетки
     private List<Node> generate_node() {

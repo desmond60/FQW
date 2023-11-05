@@ -4,9 +4,9 @@
 public partial class Solver : Window
 {
     public Solver() {
-        CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("en-US");   // Установка культуры
         InitializeComponent();
-        grid.LoadGrid();
+        CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("en-US");   // Установка культуры
+        grid.LoadGrid(@"grid");
         LoadSigmaMaterial();
         receiversList.ItemsSource = receivers_str;   // ListBox для приемников
         sigmaList.ItemsSource = sigma_str;           // ListBox для проводимости

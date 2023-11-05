@@ -32,3 +32,4 @@ global using static FEM.other.Helper;
 // Alias
 global using Grid = FEM.grid.Grid;
 global using Complex = System.Numerics.Complex;
+global using WinForm = System.Windows.Forms;

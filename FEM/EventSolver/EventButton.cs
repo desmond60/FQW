@@ -3,10 +3,10 @@
 //: Обработчики Button
 public partial class Solver
 {
-
     //: Обработка кнопки "Построить СЛАУ"
-    private void CreateSLAU_Click(object sender, RoutedEventArgs e) {
-
+    private void CreateSLAU_Click(object sender, RoutedEventArgs e)
+    {
+        // Коэффициент nu
         var nu = double.Parse(NuBox.Text);
 
         // Составление одномерной задачи и ее решение
@@ -21,13 +21,13 @@ public partial class Solver
         slau = fem.CreateSLAU();
 
         // Запись СЛАУ
-        slau.WriteTXT();
-        slau.WriteBIN();
+        slau.WriteTXT(@"slau/slauTXT");
+        slau.WriteBIN(@"slau/slauBIN");
     }
 
     //: Обработка кнопки "Решить СЛАУ"
-    private void SolveSLAU_Click(object sender, RoutedEventArgs e) {
-
+    private void SolveSLAU_Click(object sender, RoutedEventArgs e)
+    {
         // Запуск PARDISO
         string command = "cd slau & Intel.exe & cd ..";
         Process process = Process.Start("cmd.exe", "/C " + command);
@@ -42,9 +42,9 @@ public partial class Solver
     }
 
     //: Обработка кнопки "Выдать значения в приемниках"
-    private void TableReceiver_Click(object sender, RoutedEventArgs e) {
-
-        var receivers = new Vector<double>(receivers_str.Select(n => double.Parse(n)).OrderByDescending(n => n).ToArray());
+    private void TableReceiver_Click(object sender, RoutedEventArgs e)
+    {
+        var receivers = new Vector<double>(receivers_str.Select(double.Parse).OrderByDescending(n => n).ToArray());
         var nu = double.Parse(NuBox.Text);
         var w = 2.0 * PI * nu;
         TextBoxSolver.Document.Blocks.Clear();
@@ -139,8 +139,8 @@ public partial class Solver
 
 
     //: Обработка кнопки "Добавить приемник"
-    private void AddReceiver_Click(object sender, RoutedEventArgs e) {
-        
+    private void AddReceiver_Click(object sender, RoutedEventArgs e)
+    {
         // Если значение приемника пусто
         if (ReceiverBox.Text == String.Empty || receivers_str.Contains(ReceiverBox.Text)) {
             MessageBox.Show("Значение приемника не указано или такой приемник уже задан!");
@@ -151,8 +151,8 @@ public partial class Solver
     }
 
     //: Обработка кнопки "Удалить приемник"
-    private void RemoveReceiver_Click(object sender, RoutedEventArgs e) {
-        
+    private void RemoveReceiver_Click(object sender, RoutedEventArgs e)
+    {
         // Если приемник не выбран
         if (receiversList.SelectedValue == null) {
             MessageBox.Show("Выберете приемник!");
@@ -164,13 +164,11 @@ public partial class Solver
 
     //: Обработка кнопки "Построить график Rk"
     private void DrawRkPlot_Click(object sender, RoutedEventArgs e) {
-        Rk rk = new Rk(lRk, receivers_str.Select(n => double.Parse(n)).OrderBy(n => n).ToList());
-        rk.Show();
+        (new Rk(lRk, receivers_str.Select(double.Parse).OrderBy(n => n).ToList())).ShowDialog();
     }
 
     //: Обработка кнопки "Построить график Ex"
     private void DrawExPlot_Click(object sender, RoutedEventArgs e) {
-        Ex ex = new Ex(lEx, receivers_str.Select(n => double.Parse(n)).OrderBy(n => n).ToList());
-        ex.Show();
+        (new Ex(lEx, receivers_str.Select(double.Parse).OrderBy(n => n).ToList())).ShowDialog();
     }
 }

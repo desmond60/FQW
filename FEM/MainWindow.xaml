@@ -26,7 +26,20 @@
 
         <!--#region  % ***** Панель инструментов ***** % -->
         <WpfPlot Name="GridPlot"
+                 Margin="20"
                  Grid.Column="0" Grid.Row="0"/>
+
+        <!--#region  % ***** Меню ***** % -->
+        <Menu Height="25" VerticalAlignment="Top">
+            <MenuItem Header="App">
+                <MenuItem x:Name="MIeXit" Header="Exit" Click="MIeXit_Click"></MenuItem>
+            </MenuItem>
+            <MenuItem Header="Grid">
+                <MenuItem x:Name="MIdrawGrid" Header="Drawing Grid" Click="MIdrawGrid_Click"></MenuItem>
+            </MenuItem>
+            <MenuItem Header="Neuronet" Click="MIneuronet_Click">
+            </MenuItem>
+        </Menu>
 
         <Canvas x:Name="Toolbar"
                 Grid.Column="1" Grid.Row="0"
