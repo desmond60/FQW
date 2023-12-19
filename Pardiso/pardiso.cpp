@@ -221,9 +221,24 @@ void FromRSFToCSR_Real_2_Sym(int nb, int* ig, int* jg, complex<double>* di, comp
 	}
 }
 
+// Перевод wcStr to charStr
+char* WideStringToCString(wchar_t* wcStr)
+{
+#define MAXLEN 512
+
+	static char tx[MAXLEN];
+	wcstombs(tx, wcStr, MAXLEN - 1);
+	tx[MAXLEN - 1] = 0;
+	return tx;
+}
+
 //------------------------------------------------------------------------
 int _tmain(int argc, _TCHAR* argv[])
 {
+	bool IsPause = false;    // Bool "pause"
+	if ((argc == 2) && _stricmp(WideStringToCString(argv[1]), "-p") == 0)
+		IsPause = true;
+
 	// Путь к СЛАУ
 	string path = "slauBIN/";
 
@@ -354,6 +369,8 @@ int _tmain(int argc, _TCHAR* argv[])
 	logfile.close();
 	logfile.clear();
 
-	system("pause");
+	if (IsPause)
+		system("pause");
+
 	return 0;
 }

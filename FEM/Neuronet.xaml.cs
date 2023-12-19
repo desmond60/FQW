@@ -1,4 +1,4 @@
-﻿using FEM.grid;
+﻿using System.Windows.Shell;
 
 namespace FEM;
 
@@ -24,19 +24,19 @@ public partial class Neuronet : Window
     Grid grid = new Grid();   // Структура сетки
     string pathData = @"synthetic";
 
-
     List<string> receivers_str = new List<string>();   // Лист с приемниками для ListBox
     /* ----------------------- Переменные --------------------------------- */
 
 
     //: Генерация синтетических данных
-    private (Grid, string, string) GenerateSynthetic(Grid grid)
+    private void GenerateSynthetic(Grid grid, string path)
     {
-
         StringBuilder outputSB = new StringBuilder();
 
         // Рандомное расположение объекта по среде
         (List<Item> newItems, StringBuilder inputSB) = RandomLocatedItem(grid);
+
+        File.WriteAllText(path + @"/input.txt", inputSB.ToString());
 
         // % ***** Строим сетку ***** % //
         Generate generate = new Generate(newItems, grid.Layers, grid.IsStrictGrid);
@@ -48,6 +48,9 @@ public partial class Neuronet : Window
         generate.TrySetParameter("End_BG", grid.End_BG);
         generate.TrySetParameter("SideBound", grid.SideBound);
         Grid newGrid = generate.CreateGrid();
+
+        newGrid.WriteGrid(path + "/" + "grid");
+        WriteInterface(path + @"/grid", newGrid);
 
         // % ***** Получаем решение ***** % //
 
@@ -70,9 +73,14 @@ public partial class Neuronet : Window
         slau.WriteBIN(@"slau/slauBIN");
 
         // Запуск PARDISO
-        string command = "cd slau & Intel.exe & cd ..";
-        Process process = Process.Start("cmd.exe", "/C " + command);
-        process.WaitForExit();
+        ProcessStartInfo processStart = new ProcessStartInfo();
+        processStart.FileName = "cmd.exe";
+        processStart.Arguments = "/C " + "cd slau & Intel.exe & cd ..";
+        processStart.CreateNoWindow = true;
+        processStart.UseShellExecute = false;
+        processStart.WindowStyle = ProcessWindowStyle.Hidden;
+        Process? process = Process.Start(processStart);
+        process?.WaitForExit();
 
         // Прочитать решение
         string[] Fq = File.ReadAllLines(@"slau/slauBIN/q.txt");
@@ -84,7 +92,7 @@ public partial class Neuronet : Window
         // Получение решения в приемниках
         outputSB = OutputReceiver(slau, harm1d);
 
-        return (newGrid, inputSB.ToString(), outputSB.ToString());
+        File.WriteAllText(path + @"/output.txt", outputSB.ToString());
     }
 
     //: Новая локация объекта
@@ -95,12 +103,12 @@ public partial class Neuronet : Window
         double height = grid.Items[0].End[1] - grid.Items[0].Begin[1];
 
         // Границы центра
-        double bottom = grid.Begin_BG[1] - height;
+        double bottom = grid.Begin_BG[1] + height;
         double right = grid.End_BG[0] - width;
-        double top = 0.0;
-        double left = grid.Begin_BG[0] - width;
+        double top = 0.0 - height;
+        double left = grid.Begin_BG[0] + width;
 
-        // Новая точчки объекта
+        // Новая точки объекта
         Vector<double> begin = new Vector<double>(2);
         Vector<double> end = new Vector<double>(2);
 
@@ -113,7 +121,7 @@ public partial class Neuronet : Window
         end[1] = centerY + height / 2.0;
 
         return (new List<Item>() { grid.Items[0] with { Begin = (Vector<double>)begin.Clone(), End = (Vector<double>)end.Clone() } },
-            new StringBuilder($"{begin[0]} {begin[1]} \n {end[0]} {end[1]}")
+            new StringBuilder($"{centerX} {centerY}\n{width} {height}\n{grid.Items[0].Sigma}")
         );
     }
 
@@ -133,14 +141,13 @@ public partial class Neuronet : Window
         }
 
         // ************************************* Для основной задачи ***************************** //
-        StringBuilder table = new StringBuilder(String.Format("{0,-5} | {1,-15} | {2,-15} | {3,-30} | {4,0} \n", "Приемник", "Re Ex", "Im Ex", "Hy", "Rk"));
+        StringBuilder table = new StringBuilder();
 
         var list = receivers.ToList();
         list.Reverse();
         receivers = list.ToArray();
         for (int i = 0; i < receivers.Length; i++)
         {
-
             // Находим узлы
             int id1 = 0, id2 = 0;
             for (int j = 0; j < surface.Count - 1; j++)
@@ -153,8 +160,12 @@ public partial class Neuronet : Window
             }
 
             // Находим коэффициенты прямой
-            Complex k = (slau.q[surface[id2].id] - slau.q[surface[id1].id]) / (surface[id2].node.X - surface[id1].node.X);
-            Complex b = slau.q[surface[id2].id] - k * surface[id2].node.X;
+            Complex k = 0, b = 0;
+            if (id1 >= 0 && id1 < surface.Count && id2 >= 0 && id2 < surface.Count)
+            {
+                k = (slau.q[surface[id2].id] - slau.q[surface[id1].id]) / (surface[id2].node.X - surface[id1].node.X);
+                b = slau.q[surface[id2].id] - k * surface[id2].node.X;
+            }
 
             // Компонента электрического поля
             var A = k * receivers[i] + b + harm1d.U[^1];
@@ -197,9 +208,7 @@ public partial class Neuronet : Window
             // Кажущиеся сопротивления
             var R = Pow(Norm(Z), 2) / (w * Nu0);
 
-            string str = String.Format("{0,-8} | {1,-15} | {2,-15} | {3,-30} | {4,0} \n",
-                        $"{receivers[i]}", $"{E_norm.Real.ToString("E5")}", $"{E_norm.Imaginary.ToString("E5")}",
-                        $"({H_norm.Real.ToString("E5")}, {H_norm.Imaginary.ToString("E5")})", $"{R.ToString("E5")}");
+            string str = $"{R.ToString("E5")}\n";
             table.Append(str.Replace(".", ","));
         }
         // ********************************************************************************************** //

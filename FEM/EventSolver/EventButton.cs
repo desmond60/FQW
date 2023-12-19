@@ -29,7 +29,7 @@ public partial class Solver
     private void SolveSLAU_Click(object sender, RoutedEventArgs e)
     {
         // Запуск PARDISO
-        string command = "cd slau & Intel.exe & cd ..";
+        string command = "cd slau & Intel.exe -p & cd ..";
         Process process = Process.Start("cmd.exe", "/C " + command);
         process.WaitForExit();
 

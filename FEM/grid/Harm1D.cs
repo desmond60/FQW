@@ -1,4 +1,6 @@
-﻿namespace FEM.grid;
+﻿using System.Diagnostics;
+
+namespace FEM.grid;
 
 // % ***** Структура одномерной задачи ***** % //
 public struct Harm1D
@@ -35,9 +37,14 @@ public struct Harm1D
 
     //: Запустить решатель одномерной задачи
     public void RunHarm1D() {
-        string command = "cd harm1d & Harm1D.exe & cd ..";
-        Process process = Process.Start("cmd.exe", "/C " + command);
-        process.WaitForExit();
+        ProcessStartInfo processStart = new ProcessStartInfo();
+        processStart.FileName = "cmd.exe";
+        processStart.Arguments = "/C " + "cd harm1d & Harm1D.exe & cd ..";
+        processStart.CreateNoWindow = true;
+        processStart.UseShellExecute = false;
+        processStart.WindowStyle = ProcessWindowStyle.Hidden;
+        Process? process = Process.Start(processStart);
+        process?.WaitForExit();
     }
 
     //: Чтение сетки и решения одномерной задачи

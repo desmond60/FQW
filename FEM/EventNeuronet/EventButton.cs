@@ -6,6 +6,10 @@ public partial class Neuronet
     //: Генерация синтетических данных
     private void GenerateSynthetic_Click(object sender, RoutedEventArgs e)
     {
+        // Создание таймера
+        Stopwatch stopWatch = new Stopwatch();
+        stopWatch.Start();
+
         int CountData = int.Parse(NumSyntheticData.Text);
 
         Directory.CreateDirectory(pathData);
@@ -15,14 +19,19 @@ public partial class Neuronet
             Directory.CreateDirectory(tmpPath);
 
             // Создание сетки и решения
-            (Grid newGrid, string input, string output) = GenerateSynthetic(grid);
-
-            newGrid.WriteGrid(tmpPath + "/" + "grid");
-            WriteInterface(tmpPath + @"/grid", newGrid);
-            File.WriteAllText(tmpPath + @"/input.txt", input);
-            File.WriteAllText(tmpPath + @"/output.txt", output);
+            GenerateSynthetic(grid, tmpPath);
         }
+
+        // Остановка таймера
+        stopWatch.Stop();
+        TimeSpan ts = stopWatch.Elapsed;
+        string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+            ts.Hours, ts.Minutes, ts.Seconds,
+            ts.Milliseconds / 10);
+        Timer.Text = elapsedTime;
     }
+
+
 
     //: Обработка кнопки "Добавить приемник"
     private void AddReceiver_Click(object sender, RoutedEventArgs e)

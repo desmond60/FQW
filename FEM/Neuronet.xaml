@@ -90,6 +90,10 @@
                         HorizontalAlignment="Left"
                         Click="GenerateSynthetic_Click"
                         Width="150" Height="25"/>
+                <TextBlock x:Name="Timer"
+                        Text=" "
+                        Margin="10"
+                        FontSize="18"/>
             </DockPanel>
             
             

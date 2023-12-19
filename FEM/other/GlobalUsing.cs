@@ -13,6 +13,7 @@ global using System.Text;
 global using System.Text.RegularExpressions;
 global using System.Drawing;
 global using System.Windows.Documents;
+global using System.Windows.Threading;
 
 // System-static
 global using static System.Math;
