@@ -7,6 +7,10 @@ public static class Helper
 
     public static double Nu0 = 4 * PI * 1e-7; // Вакуумная магнитная проницаемость
 
+    public static bool IsHP = true;
+
+    public static double diff = 250;
+
     //: Метод проверки элемента в листе Double точность
     public static bool ListContains(List<Layer> list, double value)
     {

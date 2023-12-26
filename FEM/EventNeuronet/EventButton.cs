@@ -13,13 +13,14 @@ public partial class Neuronet
         int CountData = int.Parse(NumSyntheticData.Text);
 
         Directory.CreateDirectory(pathData);
-        for (int i = 1; i <= CountData; i++)
+        List<Node> centres = GenerateCentres(grid, CountData);
+        for (int i = 1; i <= centres.Count; i++)
         {
             string tmpPath = pathData + "/" + i;
             Directory.CreateDirectory(tmpPath);
 
             // Создание сетки и решения
-            GenerateSynthetic(grid, tmpPath);
+            GenerateSynthetic(grid, tmpPath, centres[i - 1]);
         }
 
         // Остановка таймера

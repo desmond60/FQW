@@ -1,6 +1,4 @@
-﻿using System.Windows.Shell;
-
-namespace FEM;
+﻿namespace FEM;
 
 // % ****** Логика взаимодействия с окошком Neuronet ***** % //
 public partial class Neuronet : Window
@@ -29,12 +27,12 @@ public partial class Neuronet : Window
 
 
     //: Генерация синтетических данных
-    private void GenerateSynthetic(Grid grid, string path)
+    private void GenerateSynthetic(Grid grid, string path, Node center)
     {
         StringBuilder outputSB = new StringBuilder();
 
         // Рандомное расположение объекта по среде
-        (List<Item> newItems, StringBuilder inputSB) = RandomLocatedItem(grid);
+        (List<Item> newItems, StringBuilder inputSB) = LocatedItem(grid, center);
 
         File.WriteAllText(path + @"/input.txt", inputSB.ToString());
 
@@ -90,43 +88,71 @@ public partial class Neuronet : Window
         }
 
         // Получение решения в приемниках
-        outputSB = OutputReceiver(slau, harm1d);
+        outputSB = OutputReceiver(slau, harm1d, newGrid); // Добавить grid
 
         File.WriteAllText(path + @"/output.txt", outputSB.ToString());
     }
 
+    //: Генерация центров
+    private List<Node> GenerateCentres(Grid grid, int count)
+    {
+        List<Node> centres = new List<Node>();
+
+        // Ширина и высота объекта
+        double width = grid.Items[0].End[0] - grid.Items[0].Begin[0];
+        double height = grid.Items[0].End[1] - grid.Items[0].Begin[1];
+
+        // Границы под центр по всей среде до нуля
+        // double bottom = (grid.Begin_BG[1] + (height / 2.0)) + Helper.diff;
+        // double right = (grid.End_BG[0] - (width / 2.0)) - Helper.diff;
+        // double top = (0.0 - (height / 2.0)) - Helper.diff;
+        // double left = (grid.Begin_BG[0] + (width / 2.0)) + Helper.diff;
+
+        // Для задачи с проницаемостью 0.1
+        double bottom = -30000;
+        double left = -35000;
+        double right = 45000;
+        double top = -1250;
+
+        double a = right - left;
+        double b = top - bottom;
+
+        double S = a * b;
+        double Sp = S / (double)count;
+        double x = Sqrt(Sp);
+        double h = Math.Ceiling(b / x);
+        double w = Sp / h;
+
+        for (double i = x / 2.0; i < b; i += x)
+            for (double j = x / 2.0; j < a; j += x)
+                centres.Add(new Node(left + j, bottom + i));
+
+        return centres;
+    }
+
     //: Новая локация объекта
-    private (List<Item>, StringBuilder) RandomLocatedItem(Grid grid)
+    private (List<Item>, StringBuilder) LocatedItem(Grid grid, Node center)
     {
         // Ширина и высота объекта
         double width = grid.Items[0].End[0] - grid.Items[0].Begin[0];
         double height = grid.Items[0].End[1] - grid.Items[0].Begin[1];
 
-        // Границы центра
-        double bottom = grid.Begin_BG[1] + height;
-        double right = grid.End_BG[0] - width;
-        double top = 0.0 - height;
-        double left = grid.Begin_BG[0] + width;
-
         // Новая точки объекта
         Vector<double> begin = new Vector<double>(2);
         Vector<double> end = new Vector<double>(2);
 
-        double centerX = left + rnd.NextDouble() * (right - left);
-        double centerY = bottom + rnd.NextDouble() * (top - bottom);
-
-        begin[0] = centerX - width / 2.0;
-        begin[1] = centerY - height / 2.0;
-        end[0] = centerX + width / 2.0;
-        end[1] = centerY + height / 2.0;
+        begin[0] = center.X - width / 2.0;
+        begin[1] = center.Y - height / 2.0;
+        end[0] = center.X + width / 2.0;
+        end[1] = center.Y + height / 2.0;
 
         return (new List<Item>() { grid.Items[0] with { Begin = (Vector<double>)begin.Clone(), End = (Vector<double>)end.Clone() } },
-            new StringBuilder($"{centerX} {centerY}\n{width} {height}\n{grid.Items[0].Sigma}")
+            new StringBuilder($"{center.X} {center.Y}\n{width} {height}\n{grid.Items[0].Sigma}")
         );
     }
 
     //: Получить решение в приемниках
-    private StringBuilder OutputReceiver(SLAU slau, Harm1D harm1d)
+    private StringBuilder OutputReceiver(SLAU slau, Harm1D harm1d, Grid grid)
     {
         var receivers = new Vector<double>(receivers_str.Select(double.Parse).OrderByDescending(n => n).ToArray());
         var nu = double.Parse(NuBox.Text);

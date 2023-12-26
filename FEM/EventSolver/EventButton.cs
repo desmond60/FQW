@@ -9,16 +9,25 @@ public partial class Solver
         // Коэффициент nu
         var nu = double.Parse(NuBox.Text);
 
-        // Составление одномерной задачи и ее решение
-        harm1d = new Harm1D();
-        harm1d.WriteFileHarm1D(grid.Layers, nu);
-        harm1d.RunHarm1D();
-        harm1d.ReadMeshAndSolve();
+        // Задача HP
+        if (Helper.IsHP)
+        {
+            // Составление одномерной задачи и ее решение
+            harm1d = new Harm1D();
+            harm1d.WriteFileHarm1D(grid.Layers, nu);
+            harm1d.RunHarm1D();
+            harm1d.ReadMeshAndSolve();
 
-        // Составление СЛАУ
-        FEM fem = new FEM(grid, harm1d);
-        fem.TrySetParameter("Nu", nu);
-        slau = fem.CreateSLAU();
+            // Составление СЛАУ
+            FEM fem = new FEM(grid, harm1d);
+            fem.TrySetParameter("Nu", nu);
+            slau = fem.CreateSLAU();
+        }
+        // Задача EP
+        else
+        {
+
+        }
 
         // Запись СЛАУ
         slau.WriteTXT(@"slau/slauTXT");
@@ -59,82 +68,164 @@ public partial class Solver
             }
         }
 
-        // ************************************* Для основной задачи ***************************** //
+        // ************************************* Для основной задачи (HP) ***************************** //
 
-        StringBuilder table = new StringBuilder(String.Format("{0,-5} | {1,-15} | {2,-15} | {3,-30} | {4,0} \n", "Приемник", "Re Ex", "Im Ex", "Hy", "Rk"));
+        if (Helper.IsHP)
+        {
+            StringBuilder table = new StringBuilder(String.Format("{0,-5} | {1,-15} | {2,-15} | {3,-30} | {4,0} \n", "Приемник", "Re Ex", "Im Ex", "Hy", "Rk"));
 
-        var list = receivers.ToList();
-        list.Reverse();
-        receivers = list.ToArray();
-        for (int i = 0; i < receivers.Length; i++) {
-
-            // Находим узлы
-            int id1 = 0, id2 = 0;
-            for (int j = 0; j < surface.Count - 1; j++) {
-                if (receivers[i] >= surface[j].Item2.X && receivers[i] <= surface[j + 1].Item2.X) {
-                    id1 = j;
-                    id2 = j + 1;
+            var list = receivers.ToList();
+            list.Reverse();
+            receivers = list.ToArray();
+            for (int i = 0; i < receivers.Length; i++)
+            {
+                // Находим узлы
+                int id1 = 0, id2 = 0;
+                for (int j = 0; j < surface.Count - 1; j++)
+                {
+                    if (receivers[i] >= surface[j].Item2.X && receivers[i] <= surface[j + 1].Item2.X)
+                    {
+                        id1 = j;
+                        id2 = j + 1;
+                    }
                 }
+
+                // Находим коэффициенты прямой
+                Complex k = (slau.q[surface[id2].id] - slau.q[surface[id1].id]) / (surface[id2].node.X - surface[id1].node.X);
+                Complex b = slau.q[surface[id2].id] - k * surface[id2].node.X;
+
+                // Компонента электрического поля
+                var A = k * receivers[i] + b + harm1d.U[^1];
+                var E = (-1) * new Complex(0, 1) * w * A;
+                var E1D = (-1) * new Complex(0, 1) * w * harm1d.U[^1];
+                var E_norm = E / E1D;
+
+                // Находим в какой элемент попадает приемник
+                var node = new Node(receivers[i], 0);
+                int id_elem = 0;
+                for (int j = 0; j < grid.Elems.Count; j++)
+                {
+                    if ((node.X >= grid.Nodes[grid.Elems[j].Node[0]].X && node.X < grid.Nodes[grid.Elems[j].Node[3]].X) &&
+                        (node.Y > grid.Nodes[grid.Elems[j].Node[0]].Y && node.Y <= grid.Nodes[grid.Elems[j].Node[3]].Y))
+                        id_elem = j;
+                }
+                var elem = grid.Elems[id_elem];
+
+                // Компоненты hx и hy
+                double hx = grid.Nodes[elem.Node[3]].X - grid.Nodes[elem.Node[0]].X;
+                double hy = grid.Nodes[elem.Node[3]].Y - grid.Nodes[elem.Node[0]].Y;
+
+                // Производная базисных функций
+                var phi1 = -1 / hx;
+                var phi2 = 1 / hx;
+                var phi3 = 1 / hy;
+                var phi4 = -1 / hy;
+
+                // Сумма
+                var Sum = phi1 * slau.q[elem.Edge[0]] + phi2 * slau.q[elem.Edge[1]] + phi3 * slau.q[elem.Edge[2]] + phi4 * slau.q[elem.Edge[3]];
+
+                // Компонента магнитного поля
+                var H1D = (harm1d.U[^1] - harm1d.U[^2]) / (harm1d.Nodes[^1].Y - harm1d.Nodes[^2].Y);
+                var H = (Sum + H1D) / Nu0;
+                var H_norm = H / H1D;
+
+                // Компонента Z в случае H-поляризации ()
+                var Z = E / H;
+
+                // Кажущиеся сопротивления
+                var R = Pow(Norm(Z), 2) / (w * Nu0);
+
+                // Добавление в листы
+                lEx.Add(E_norm);
+                lRk.Add(R);
+
+                string str = String.Format("{0,-8} | {1,-15} | {2,-15} | {3,-30} | {4,0} \n",
+                            $"{receivers[i]}", $"{E_norm.Real.ToString("E5")}", $"{E_norm.Imaginary.ToString("E5")}",
+                            $"({H_norm.Real.ToString("E5")}, {H_norm.Imaginary.ToString("E5")})", $"{R.ToString("E5")}");
+                table.Append(str.Replace(".", ","));
             }
 
-            // Находим коэффициенты прямой
-            Complex k = (slau.q[surface[id2].id] - slau.q[surface[id1].id]) / (surface[id2].node.X - surface[id1].node.X);
-            Complex b = slau.q[surface[id2].id] - k * surface[id2].node.X;
-
-            // Компонента электрического поля
-            var A = k * receivers[i] + b + harm1d.U[^1];
-            var E = (-1) * new Complex(0, 1) * w * A;
-            var E1D = (-1) * new Complex(0, 1) * w * harm1d.U[^1];
-            var E_norm = E / E1D;
-
-            // Находим в какой элемент попадает приемник
-            var node = new Node(receivers[i], 0);
-            int id_elem = 0;
-            for (int j = 0; j < grid.Elems.Count; j++) {
-                if ((node.X >= grid.Nodes[grid.Elems[j].Node[0]].X && node.X < grid.Nodes[grid.Elems[j].Node[3]].X) &&
-                    (node.Y > grid.Nodes[grid.Elems[j].Node[0]].Y && node.Y <= grid.Nodes[grid.Elems[j].Node[3]].Y))
-                    id_elem = j;
-            }
-            var elem = grid.Elems[id_elem];
-
-            // Компоненты hx и hy
-            double hx = grid.Nodes[elem.Node[3]].X - grid.Nodes[elem.Node[0]].X;
-            double hy = grid.Nodes[elem.Node[3]].Y - grid.Nodes[elem.Node[0]].Y;
-
-            // Производная базисных функций
-            var phi1 = -1 / hx;
-            var phi2 = 1 / hx;
-            var phi3 = 1 / hy;
-            var phi4 = -1 / hy;
-
-            // Сумма
-            var Sum = phi1 * slau.q[elem.Edge[0]] + phi2 * slau.q[elem.Edge[1]] + phi3 * slau.q[elem.Edge[2]] + phi4 * slau.q[elem.Edge[3]];
-
-            // Компонента магнитного поля
-            var H1D = (harm1d.U[^1] - harm1d.U[^2]) / (harm1d.Nodes[^1].Y - harm1d.Nodes[^2].Y);
-            var H = (Sum + H1D) / Nu0;
-            var H_norm = H / H1D;
-
-            // Компонента Z в случае H-поляризации ()
-            var Z = E / H;
-
-            // Кажущиеся сопротивления
-            var R = Pow(Norm(Z), 2) / (w * Nu0);
-
-            // Добавление в листы
-            lEx.Add(E_norm);
-            lRk.Add(R);
-
-            string str = String.Format("{0,-8} | {1,-15} | {2,-15} | {3,-30} | {4,0} \n",
-                        $"{receivers[i]}", $"{E_norm.Real.ToString("E5")}", $"{E_norm.Imaginary.ToString("E5")}",
-                        $"({H_norm.Real.ToString("E5")}, {H_norm.Imaginary.ToString("E5")})", $"{R.ToString("E5")}");
-            table.Append(str.Replace(".", ","));
+            TextBoxSolver.Document.Blocks.Add(new Paragraph(new Run(table.ToString())));
+            File.WriteAllText(@"slau/resultHP.txt", table.ToString());
         }
 
-        TextBoxSolver.Document.Blocks.Add(new Paragraph(new Run(table.ToString())));
-        File.WriteAllText(@"slau/result.txt", table.ToString());
-
         // ********************************************************************************************** //
+
+        // ************************************* Для основной задачи (EP) ***************************** //
+        else
+        {
+            StringBuilder table = new StringBuilder(String.Format("{0,-5} | {1,-15} | {2,-15} | {3,-30} | {4,0} \n", "Приемник", "Re Ey", "Im Ey", "Hx", "Rk"));
+
+            var list = receivers.ToList();
+            list.Reverse();
+            receivers = list.ToArray();
+            for (int i = 0; i < receivers.Length; i++)
+            {
+                // Находим узлы
+                int id1 = 0, id2 = 0;
+                for (int j = 0; j < surface.Count - 1; j++)
+                {
+                    if (receivers[i] >= surface[j].Item2.X && receivers[i] <= surface[j + 1].Item2.X)
+                    {
+                        id1 = j;
+                        id2 = j + 1;
+                    }
+                }
+
+                // Находим коэффициенты прямой
+                Complex k = (slau.q[surface[id2].id] - slau.q[surface[id1].id]) / (surface[id2].node.X - surface[id1].node.X);
+                Complex b = slau.q[surface[id2].id] - k * surface[id2].node.X;
+
+                // Компонента электрического поля
+                var A = k * receivers[i] + b + harm1d.U[^1];
+                var E = (-1) * new Complex(0, 1) * w * A;
+                var E1D = (-1) * new Complex(0, 1) * w * harm1d.U[^1];
+                var E_norm = E / E1D;
+
+                // Находим в какой элемент попадает приемник
+                var node = new Node(receivers[i], 0);
+                int id_elem = 0;
+                for (int j = 0; j < grid.Elems.Count; j++)
+                {
+                    if ((node.X >= grid.Nodes[grid.Elems[j].Node[0]].X && node.X < grid.Nodes[grid.Elems[j].Node[3]].X) &&
+                        (node.Y > grid.Nodes[grid.Elems[j].Node[0]].Y && node.Y <= grid.Nodes[grid.Elems[j].Node[3]].Y))
+                        id_elem = j;
+                }
+                var elem = grid.Elems[id_elem];
+
+                // Компоненты hx и hy
+                double hx = grid.Nodes[elem.Node[3]].X - grid.Nodes[elem.Node[0]].X;
+                double hy = grid.Nodes[elem.Node[3]].Y - grid.Nodes[elem.Node[0]].Y;
+
+                // Производная базисных функций
+                var phi1 = -1 / hx;
+                var phi2 = 1 / hx;
+                var phi3 = 1 / hy;
+                var phi4 = -1 / hy;
+
+                // Сумма
+                var Sum = phi1 * slau.q[elem.Edge[0]] + phi2 * slau.q[elem.Edge[1]] + phi3 * slau.q[elem.Edge[2]] + phi4 * slau.q[elem.Edge[3]];
+
+                // Компонента магнитного поля
+                var H1D = (harm1d.U[^1] - harm1d.U[^2]) / (harm1d.Nodes[^1].Y - harm1d.Nodes[^2].Y);
+                var H = (Sum + H1D) / Nu0;
+                var H_norm = H / H1D;
+
+                // Компонента Z в случае H-поляризации ()
+                var Z = E / H;
+
+                // Кажущиеся сопротивления
+                var R = Pow(Norm(Z), 2) / (w * Nu0);
+
+                string str = String.Format("{0,-8} | {1,-15} | {2,-15} | {3,-30} | {4,0} \n",
+                            $"{receivers[i]}", $"{E_norm.Real.ToString("E5")}", $"{E_norm.Imaginary.ToString("E5")}",
+                            $"({H_norm.Real.ToString("E5")}, {H_norm.Imaginary.ToString("E5")})", $"{R.ToString("E5")}");
+                table.Append(str.Replace(".", ","));
+            }
+
+            TextBoxSolver.Document.Blocks.Add(new Paragraph(new Run(table.ToString())));
+            File.WriteAllText(@"slau/resultEP.txt", table.ToString());
+        }
     }
 
 

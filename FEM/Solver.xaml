@@ -97,16 +97,25 @@
 
             <StackPanel Canvas.Left="15"
                         Canvas.Top="200">
-                <Button Content="Составить СЛАУ"
-                        Margin="5"
-                        Click="CreateSLAU_Click"/>
+                <DockPanel>
+                    <Button Content="Составить СЛАУ"
+                            Margin="5"
+                            Width="200"
+                            Click="CreateSLAU_Click"/>
+                    <RadioButton Margin="5" GroupName="Amperage" Content="HP" IsChecked="True" Checked="RBHP_Checked"/>
+                    <RadioButton Margin="5" GroupName="Amperage" Content="EP" Checked="RBEP_Checked"/>
+                </DockPanel>
             
                 <Button Content="Решить СЛАУ"
                         Margin="5"
+                        Width="200"
+                        HorizontalAlignment="Left"
                         Click="SolveSLAU_Click"/>
 
                 <Button Content="Выдать значения в приемниках"
                         Margin="5"
+                        Width="200"
+                        HorizontalAlignment="Left"
                         Click="TableReceiver_Click"/>
             </StackPanel>
 

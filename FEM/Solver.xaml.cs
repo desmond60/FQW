@@ -37,5 +37,17 @@ public partial class Solver : Window
         for (int i = 0; i < grid.Sigmas.Count; i++)
             sigma_str.Add($"{i + 1} 1D = {grid.Sigmas[i].Sigma1D.ToString("E3")} 2D = {grid.Sigmas[i].Sigma2D.ToString("E3")}");
     }
+    
+    //: Решить задачу HP
+    private void RBHP_Checked(object sender, RoutedEventArgs e)
+    {
+        Helper.IsHP = true;
+    }
+
+    //: Решить задачу EP
+    private void RBEP_Checked(object sender, RoutedEventArgs e)
+    {
+        Helper.IsHP = false;
+    }
 }
 
