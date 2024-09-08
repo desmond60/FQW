@@ -1,4 +1,6 @@
-﻿namespace FEM;
+﻿using ScottPlot.MarkerShapes;
+
+namespace FEM;
 
 //: Обработчики Button
 public partial class Neuronet
@@ -6,6 +8,71 @@ public partial class Neuronet
     //: Генерация синтетических данных
     private void GenerateSynthetic_Click(object sender, RoutedEventArgs e)
     {
+        NuList.Clear();
+
+        // Генерация частот
+        double beginF = double.Parse(NuBoxFrom.Text);
+        double endF = double.Parse(NuBoxTo.Text);
+        int countF = int.Parse(CountNu.Text);
+        double K = 1.2;
+
+/*        NuList.Add(beginF);
+        double start = beginF;
+        for (int i = 0; i < countF - 1; i++)
+        {
+            start *= 2;
+            NuList.Add(start);
+        }*/
+
+
+        double distY = endF - beginF;
+        double hY;
+        if (K != 1)
+        {
+            if (K > 0)
+                hY = distY * (1 - K) / (1 - Pow(K, countF));
+            else
+            {
+                K = 1 / Abs(K);
+                hY = distY * (K - 1) / (Pow(K, countF) - 1);
+            }
+        }
+        else
+            hY = distY / countF;
+
+        NuList.Add(beginF);
+        double startY = beginF;
+        while (true)
+        {
+            startY += hY;
+            hY *= K;
+            NuList.Add(startY);
+
+            if (Abs((startY + hY) - endF) < 1e-7)
+            {
+                NuList.Add(endF);
+                break;
+            }
+        }
+
+
+        /*        double dist = endF - beginF;
+                double h = dist / countF;
+
+                NuList.Add(beginF);
+                double start = beginF;
+                while (true)
+                {
+                    start += h;
+                    NuList.Add(start);
+
+                    if (Abs((start + h) - endF) < 1e-7)
+                    {
+                        NuList.Add(endF);
+                        break;
+                    }
+                }*/
+
         // Создание таймера
         Stopwatch stopWatch = new Stopwatch();
         stopWatch.Start();

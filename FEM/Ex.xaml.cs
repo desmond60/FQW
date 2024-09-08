@@ -21,7 +21,7 @@ public partial class Ex : Window
                         };*/
 
         // График модель 2Д-1 при частоте 10 Гц
-        /*var abs = new double[] {
+        var abs = new double[] {
                             0.289,
                             0.703,
                             0.962,
@@ -29,17 +29,20 @@ public partial class Ex : Window
                             0.995,
                             0.996,
                             0.996
-                        };*/
+                        };
 
         var scatter = ExPlot.Plot.AddScatter(receivers.ToArray(), lEx.Select(n => n.Real).ToArray(), Color.Green);
         scatter.LineWidth = 2;
         scatter.MarkerColor = Color.Black;
         scatter.Label = "Решение моей программы";
-/*
+
         scatter = ExPlot.Plot.AddScatter(receivers.ToArray(), abs, Color.Brown);
         scatter.LineWidth = 2;
         scatter.MarkerColor = Color.Black;
-        scatter.Label = "Решение авторами COMMEMI";*/
+        scatter.Label = "Решение авторами COMMEMI";
+
+        ExPlot.Plot.XAxis.Label("X, м");
+        ExPlot.Plot.YAxis.Label("Ex, В\\м");
 
         ExPlot.Plot.Legend(true);
         ExPlot.Refresh();

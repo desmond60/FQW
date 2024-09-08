@@ -19,7 +19,7 @@
                 <TextBox x:Name="NumSyntheticData"
                          HorizontalAlignment="Left"
                          Padding="2"
-                         Text="1"
+                         Text="100"
                          TextAlignment="Center"
                          Width="100"
                          PreviewTextInput="PreviewTextInputInt"/>
@@ -29,24 +29,36 @@
             <StackPanel>
                 <!-- % ***** Надпись nu ***** % -->
                 <DockPanel>
-                    <TextBlock Text="&#957;: "
-                        Margin="5"
-                        FontSize="18"/>
-                    <TextBox x:Name="NuBox"
+                    <TextBox x:Name="NuBoxFrom"
                         Padding="2"
                         Margin="5"
-                        Text="1.0"
+                        Text="0.0001"
                         TextAlignment="Center"
+                        HorizontalAlignment="Left"
                         Width="75"
-                        PreviewTextInput="PreviewTextInputDouble"
-                        TextChanged="NuBox_TextChanged"/>
-                    <TextBlock Text="&#969;=2&#960;&#957;"
+                        PreviewTextInput="PreviewTextInputDouble"/>
+                    <TextBlock Text="&#8804; &#957; &#8804;"
                         Margin="5"
                         FontSize="18"/>
-                    <TextBlock x:Name="WBox"
-                        Text="(6.2831)"
+                    <TextBox x:Name="NuBoxTo"
+                        Padding="2"
+                        Margin="5"
+                        Text="500"
+                        TextAlignment="Center"
+                        HorizontalAlignment="Left"
+                        Width="75"
+                        PreviewTextInput="PreviewTextInputDouble"/>
+                    <TextBlock Text="Количество частот:"
                         Margin="5"
                         FontSize="18"/>
+                    <TextBox x:Name="CountNu"
+                        Padding="2"
+                        Margin="5"
+                        Text="40"
+                        TextAlignment="Center"
+                        HorizontalAlignment="Left"
+                        Width="75"
+                        PreviewTextInput="PreviewTextInputInt"/>
                 </DockPanel>
 
                 <!-- % ***** Надпись ***** % -->

@@ -23,18 +23,17 @@ public partial class Neuronet : Window
     string pathData = @"synthetic";
 
     List<string> receivers_str = new List<string>();   // Лист с приемниками для ListBox
+    List<double> NuList = new List<double>(); // Лист с частотами
     /* ----------------------- Переменные --------------------------------- */
 
 
     //: Генерация синтетических данных
     private void GenerateSynthetic(Grid grid, string path, Node center)
     {
-        StringBuilder outputSB = new StringBuilder();
-
         // Рандомное расположение объекта по среде
-        (List<Item> newItems, StringBuilder inputSB) = LocatedItem(grid, center);
+        (List<Item> newItems, StringBuilder outputSB) = LocatedItem(grid, center);
 
-        File.WriteAllText(path + @"/input.txt", inputSB.ToString());
+        //File.WriteAllText(path + @"/input.txt", inputSB.ToString());
 
         // % ***** Строим сетку ***** % //
         Generate generate = new Generate(newItems, grid.Layers, grid.IsStrictGrid);
@@ -47,50 +46,64 @@ public partial class Neuronet : Window
         generate.TrySetParameter("SideBound", grid.SideBound);
         Grid newGrid = generate.CreateGrid();
 
-        newGrid.WriteGrid(path + "/" + "grid");
-        WriteInterface(path + @"/grid", newGrid);
+        // Записать сеточку
+        //newGrid.WriteGrid(path + "/" + "grid");
+        //WriteInterface(path + @"/grid", newGrid);
 
-        // % ***** Получаем решение ***** % //
+        // % ***** Получаем решения с частотами ***** % //
+        bool false_gen = false;
+        for (int Nui = 0; Nui < NuList.Count; Nui++)
+        {
+            var nu = NuList[Nui];
 
-        // Коэффициент nu
-        var nu = double.Parse(NuBox.Text);
+            // Составление одномерной задачи и ее решение
+            Harm1D harm1d = new Harm1D();
+            harm1d.WriteFileHarm1D(newGrid.Layers, nu);
+            harm1d.RunHarm1D();
+            harm1d.ReadMeshAndSolve();
 
-        // Составление одномерной задачи и ее решение
-        Harm1D harm1d = new Harm1D();
-        harm1d.WriteFileHarm1D(newGrid.Layers, nu);
-        harm1d.RunHarm1D();
-        harm1d.ReadMeshAndSolve();
+            // Составление СЛАУ
+            FEM fem = new FEM(newGrid, harm1d);
+            fem.TrySetParameter("Nu", nu);
+            SLAU slau = fem.CreateSLAU();
 
-        // Составление СЛАУ
-        FEM fem = new FEM(newGrid, harm1d);
-        fem.TrySetParameter("Nu", nu);
-        SLAU slau = fem.CreateSLAU();
+            // Запись СЛАУ
+            slau.WriteTXT(@"slau/slauTXT");
+            slau.WriteBIN(@"slau/slauBIN");
 
-        // Запись СЛАУ
-        slau.WriteTXT(@"slau/slauTXT");
-        slau.WriteBIN(@"slau/slauBIN");
+            // Запуск PARDISO
+            ProcessStartInfo processStart = new ProcessStartInfo();
+            processStart.FileName = "cmd.exe";
+            processStart.Arguments = "/C " + "cd slau & Intel.exe & cd ..";
+            processStart.CreateNoWindow = true;
+            processStart.UseShellExecute = false;
+            processStart.WindowStyle = ProcessWindowStyle.Hidden;
+            Process? process = Process.Start(processStart);
+            process?.WaitForExit();
 
-        // Запуск PARDISO
-        ProcessStartInfo processStart = new ProcessStartInfo();
-        processStart.FileName = "cmd.exe";
-        processStart.Arguments = "/C " + "cd slau & Intel.exe & cd ..";
-        processStart.CreateNoWindow = true;
-        processStart.UseShellExecute = false;
-        processStart.WindowStyle = ProcessWindowStyle.Hidden;
-        Process? process = Process.Start(processStart);
-        process?.WaitForExit();
+            // Прочитать решение
+            string[] Fq = File.ReadAllLines(@"slau/slauBIN/q.txt");
+            for (int i = 0; i < slau.N; i++)
+            {
+                var q = Fq[i].Trim().Split(" ", StringSplitOptions.RemoveEmptyEntries);
+                slau.q[i] = new Complex(double.Parse(q[0]), double.Parse(q[1]));
+            }
 
-        // Прочитать решение
-        string[] Fq = File.ReadAllLines(@"slau/slauBIN/q.txt");
-        for (int i = 0; i < slau.N; i++) {
-            var q = Fq[i].Trim().Split(" ", StringSplitOptions.RemoveEmptyEntries);
-            slau.q[i] = new Complex(double.Parse(q[0]), double.Parse(q[1]));
+            // Получение решения в приемниках
+            var stroka = OutputReceiver(slau, harm1d, newGrid, nu);
+            if (stroka == String.Empty)
+            {
+                false_gen = true;
+                break;
+            }
+
+            outputSB.Append(stroka);
         }
 
-        // Получение решения в приемниках
-        outputSB = OutputReceiver(slau, harm1d, newGrid); // Добавить grid
-
-        File.WriteAllText(path + @"/output.txt", outputSB.ToString());
+        if (false_gen)
+            Directory.Delete(path);
+        else
+            File.WriteAllText(path + @"/output.txt", outputSB.ToString());
     }
 
     //: Генерация центров
@@ -109,10 +122,16 @@ public partial class Neuronet : Window
         // double left = (grid.Begin_BG[0] + (width / 2.0)) + Helper.diff;
 
         // Для задачи с проницаемостью 0.1
-        double bottom = -30000;
-        double left = -35000;
-        double right = 45000;
+        double bottom = -4000;
+        double left = -2000;
+        double right = 20000;
         double top = -1250;
+
+        // Для теста
+        /*        double bottom = -3000;
+                double left = -1000;
+                double right = 17000;
+                double top = -1250;*/
 
         double a = right - left;
         double b = top - bottom;
@@ -147,15 +166,14 @@ public partial class Neuronet : Window
         end[1] = center.Y + height / 2.0;
 
         return (new List<Item>() { grid.Items[0] with { Begin = (Vector<double>)begin.Clone(), End = (Vector<double>)end.Clone() } },
-            new StringBuilder($"{center.X} {center.Y}\n{width} {height}\n{grid.Items[0].Sigma}")
+            new StringBuilder($"{center.X} {center.Y} {width} {height} {grid.Items[0].Sigma}\n")
         );
     }
 
     //: Получить решение в приемниках
-    private StringBuilder OutputReceiver(SLAU slau, Harm1D harm1d, Grid grid)
+    private string OutputReceiver(SLAU slau, Harm1D harm1d, Grid grid, double nu)
     {
         var receivers = new Vector<double>(receivers_str.Select(double.Parse).OrderByDescending(n => n).ToArray());
-        var nu = double.Parse(NuBox.Text);
         var w = 2.0 * PI * nu;
 
         List<(int id, Node node)> surface = new List<(int, Node)>();
@@ -168,6 +186,7 @@ public partial class Neuronet : Window
 
         // ************************************* Для основной задачи ***************************** //
         StringBuilder table = new StringBuilder();
+        bool false_gen = false;
 
         var list = receivers.ToList();
         list.Reverse();
@@ -234,12 +253,20 @@ public partial class Neuronet : Window
             // Кажущиеся сопротивления
             var R = Pow(Norm(Z), 2) / (w * Nu0);
 
-            string str = $"{R.ToString("E5")}\n";
-            table.Append(str.Replace(".", ","));
+            if (R > 110.0)
+            {
+                false_gen = true;
+                break;
+            }
+
+            table.Append($"{R.ToString("F8")} ");
         }
         // ********************************************************************************************** //
 
-        return table;
+        if (false_gen)
+            return String.Empty;
+
+        return table.ToString() + "\n";
     }
 
     //: Запись интерфейса
