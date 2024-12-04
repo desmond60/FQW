@@ -51,10 +51,15 @@ public partial class Neuronet : Window
         //WriteInterface(path + @"/grid", newGrid);
 
         // % ***** Получаем решения с частотами ***** % //
-        bool false_gen = false;
         for (int Nui = 0; Nui < NuList.Count; Nui++)
         {
             var nu = NuList[Nui];
+
+            // Решение для друго направления тока
+            MTZ2D mtz2d = new MTZ2D();
+            mtz2d.WriteFileMtz2D(nu, newItems[0]);
+            mtz2d.RunMtz2D();
+            mtz2d.ReadSolve();
 
             // Составление одномерной задачи и ее решение
             Harm1D harm1d = new Harm1D();
@@ -91,20 +96,47 @@ public partial class Neuronet : Window
 
             // Получение решения в приемниках
             var stroka = OutputReceiver(slau, harm1d, newGrid, nu);
-            if (stroka == String.Empty)
-            {
-                false_gen = true;
-                break;
-            }
 
             outputSB.Append(stroka);
+            outputSB.Append(" ");
+            outputSB.Append(String.Join(" ", mtz2d.Rk));
+            outputSB.AppendLine();
         }
 
-        if (false_gen)
-            Directory.Delete(path);
-        else
-            File.WriteAllText(path + @"/output.txt", outputSB.ToString());
+        File.WriteAllText(path, outputSB.ToString());
     }
+
+    private void NewGenerateSynthetic(Grid grid, string path, Node center)
+    {
+        // Рандомное расположение объекта по среде
+        (List<Item> newItems, StringBuilder outputSB) = LocatedItem(grid, center);
+
+        // % ***** Получаем решения с частотами ***** % //
+        for (int Nui = 0; Nui < NuList.Count; Nui++)
+        {
+            var nu = NuList[Nui];
+
+            // Решение для друго направления тока
+            MTZ2D mtz2d = new MTZ2D();
+            mtz2d.WriteFileMtz2D(nu, newItems[0]);
+            mtz2d.RunMtz2D();
+            mtz2d.ReadSolve();
+
+            // Решение вместо моего для первого направления тока
+            MTZ2D mtz2d_main = new MTZ2D();
+            mtz2d_main.WriteFileMtz2D(nu, newItems[0], dir: 0);
+            mtz2d_main.RunMtz2D();
+            mtz2d_main.ReadSolve();
+
+            outputSB.Append(String.Join(" ", mtz2d_main.Rk));
+            outputSB.Append(" ");
+            outputSB.Append(String.Join(" ", mtz2d.Rk));
+            outputSB.AppendLine();
+        }
+
+        File.WriteAllText(path, outputSB.ToString());
+    }
+
 
     //: Генерация центров
     private List<Node> GenerateCentres(Grid grid, int count)
@@ -123,9 +155,9 @@ public partial class Neuronet : Window
 
         // Для задачи с проницаемостью 0.1
         double bottom = -4000;
-        double left = -2000;
+        double left = -5000;
         double right = 20000;
-        double top = -1250;
+        double top = -1150;
 
         // Для теста
         /*        double bottom = -3000;
@@ -166,7 +198,7 @@ public partial class Neuronet : Window
         end[1] = center.Y + height / 2.0;
 
         return (new List<Item>() { grid.Items[0] with { Begin = (Vector<double>)begin.Clone(), End = (Vector<double>)end.Clone() } },
-            new StringBuilder($"{center.X} {center.Y} {width} {height} {grid.Items[0].Sigma}\n")
+            new StringBuilder($"{center.X} {center.Y} {grid.Items[0].Sigma}\n")
         );
     }
 
@@ -253,20 +285,20 @@ public partial class Neuronet : Window
             // Кажущиеся сопротивления
             var R = Pow(Norm(Z), 2) / (w * Nu0);
 
-            if (R > 110.0)
-            {
-                false_gen = true;
-                break;
-            }
+            //if (R > 110.0)
+            //{
+            //    false_gen = true;
+            //    break;
+            //}
 
             table.Append($"{R.ToString("F8")} ");
         }
         // ********************************************************************************************** //
 
-        if (false_gen)
-            return String.Empty;
+        //if (false_gen)
+        //    return String.Empty;
 
-        return table.ToString() + "\n";
+        return table.ToString();
     }
 
     //: Запись интерфейса
