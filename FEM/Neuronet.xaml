@@ -100,15 +100,22 @@
             <DockPanel Margin="10">
                 <Button Content="Генерация файлов"
                         HorizontalAlignment="Left"
-                        Click="GenerateSynthetic_Click"
+                        Click="GenerateSynthetic_MTZ_2D_Click_Solo"
                         Width="150" Height="25"/>
                 <TextBlock x:Name="Timer"
                         Text=" "
                         Margin="10"
                         FontSize="18"/>
             </DockPanel>
-            
-            
+
+            <DockPanel Margin="10">
+                <Button Content="Решение Гаусс-Ньютон"
+                        HorizontalAlignment="Left"
+                        Click="GaussNewton_Click"
+                        Width="150" Height="25"/>
+            </DockPanel>
+
+
         </StackPanel>
         
     </Grid>

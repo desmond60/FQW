@@ -1,4 +1,6 @@
-﻿namespace FEM;
+﻿using System.Windows.Media.Media3D;
+
+namespace FEM;
 
 // % ****** Логика взаимодействия с окошком Neuronet ***** % //
 public partial class Neuronet : Window
@@ -179,6 +181,52 @@ public partial class Neuronet : Window
                 centres.Add(new Node(left + j, bottom + i));
 
         return centres;
+    }
+
+    //: Новая генерация центров 
+    private List<Node> NewGenerateCentres(int count, (double width, double height) size)
+    {
+        // Для основного объекта
+        //double bottom = -4000;
+        //double left = -5000;
+        //double right = 20000;
+        //double top = -1150;
+
+        double bottom = -250 - (size.height / 2.0) - 5000;
+        double left = -250; // -250; 10100
+        double right = 20000; // 10000; 20000
+        double top = -250 - (size.height / 2.0);
+
+        double width = right - left;
+        double height = top - bottom;
+
+        // Вычисляем количество точек по горизонтали и вертикали
+        int columns = (int)Math.Ceiling(Math.Sqrt(count * (width / height)));
+        int rows = (int)Math.Ceiling((double)count / columns);
+
+        // Шаг между точками
+        double stepX = width / (columns - 1);
+        double stepY = height / (rows - 1);
+
+        // Список координат точек
+        List<Node> points = new List<Node>();
+
+        for (int row = 0; row < rows; row++)
+        {
+            for (int col = 0; col < columns; col++)
+            {
+                double x = left + col * stepX;
+                double y = top - row * stepY;
+                points.Add(new Node(x, y));
+
+                if (points.Count == count)
+                    break;
+            }
+            if (points.Count == count)
+                break;
+        }
+
+        return points;
     }
 
     //: Новая локация объекта
